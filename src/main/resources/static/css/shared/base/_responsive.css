@@ -1,0 +1,16 @@
+/* Responsive adjustments from meeting-rooms-management.html */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 15px;
+  }
+
+  .page-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .content-container {
+    padding: 1rem;
+  }
+  /* Add other responsive rules as needed */
+}

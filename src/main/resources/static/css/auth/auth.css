@@ -1,0 +1,355 @@
+/* === Variables Copied from shared/base/_variables.css (Light Mode Only) === */
+:root {
+  /* Define Shared Purple Variables */
+  --purple-primary: rgb(86, 43, 129);
+  --purple-dark: rgb(70, 27, 113);
+  --purple-light: rgb(106, 63, 149);
+  --purple-lighter: rgba(149, 105, 212, 0.1);
+
+  /* --- Override Bootstrap Defaults to Use Purple --- */
+  --bs-primary: var(--purple-primary);
+  --bs-primary-rgb: 86, 43, 129; /* Provide RGB for Bootstrap utilities */
+  --bs-link-color: var(--purple-primary);
+  --bs-link-hover-color: var(--purple-dark);
+  /* Optional: Override text-primary if needed */
+  /* --bs-text-primary: var(--purple-primary); */
+
+  /* --- Other Shared Variables (Light Mode) --- */
+  --bg-color: #ffffff;
+  --text-color: #212529;
+  --secondary-text-color: #6c757d;
+  --border-color: #dee2e6;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --link-color: var(
+    --purple-primary
+  ); /* Keep for specific 'a' tag styling if needed */
+  --link-hover-color: var(
+    --purple-dark
+  ); /* Keep for specific 'a' tag styling if needed */
+
+  /* Button specific variables (used by rules copied from _buttons.css) */
+  --button-primary-bg: var(--bs-primary); /* Use the overridden BS primary */
+  --button-primary-text: #ffffff;
+  --button-primary-hover-bg: var(--purple-dark); /* Keep specific hover */
+  --button-secondary-bg: #6c757d;
+  --button-secondary-text: #ffffff;
+  --button-secondary-hover-bg: #5a6268;
+}
+
+/* === Styles Copied from shared/base/_base.css === */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll; /* From shared */
+}
+
+main {
+  /* Layout structure kept */
+  flex: 1;
+}
+
+.footer {
+  /* Layout structure kept */
+  margin-top: auto;
+}
+
+a {
+  color: var(--bs-link-color); /* Use overridden BS link color */
+  text-decoration: none;
+}
+a:hover {
+  color: var(--bs-link-hover-color); /* Use overridden BS link hover color */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-color);
+}
+
+.text-muted {
+  color: var(--secondary-text-color) !important; /* Shared override */
+}
+
+/* === Styles Copied from shared/components/_cards.css (Prioritized) === */
+.card {
+  background-color: var(--card-bg);
+  border-radius: 10px; /* Shared */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shared */
+  margin-bottom: 1.5rem; /* Shared */
+  transition: all 0.3s ease; /* Shared */
+  overflow: hidden; /* Shared */
+  border: none; /* Shared */
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Shared */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Shared */
+}
+
+.card-header {
+  /* USING GRADIENT from shared, now that bg-primary is handled by override */
+  background: linear-gradient(
+    to right,
+    var(--purple-primary),
+    /* Use purple vars directly */ var(--purple-light)
+  );
+  /* If bg-primary class is kept in HTML, the gradient might be overridden. */
+  /* Consider removing bg-primary from HTML if gradient is desired. */
+  /* OR, keep bg-primary and apply gradient via .card-header specific rule */
+  /* Let's assume for now the gradient IS desired and overrides potential bg-primary */
+  color: white; /* Shared */
+  font-weight: 600; /* Shared */
+  border: none; /* Shared */
+  padding: 1rem 1.25rem; /* Shared */
+  border-top-left-radius: 10px; /* Match card radius */
+  border-top-right-radius: 10px; /* Match card radius */
+}
+
+/* Ensure header text is white (h3 used in auth) */
+.card-header h3 {
+  color: white;
+  margin-bottom: 0; /* Shared */
+}
+
+.card-body {
+  padding: 1.5rem; /* Shared */
+}
+
+.card-footer {
+  background-color: rgba(0, 0, 0, 0.02); /* Shared */
+  border-top: 1px solid var(--border-color); /* Shared */
+  padding: 1rem 1.25rem; /* Shared */
+}
+
+/* === Styles Copied from shared/components/_buttons.css (Prioritized) === */
+.btn {
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+  /* Ensure focus shadow matches forms focus */
+  /* box-shadow: none; /* Optional: remove default focus shadow */
+}
+.btn:focus,
+.btn.focus {
+  /* More specific BS focus */
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25); /* Use overridden primary color for focus ring */
+}
+
+/* Explicitly set default state for btn-primary to ensure override */
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+  color: var(--button-primary-text) !important; /* Ensure text color is white */
+}
+
+/* Primary Button Hover (already has !important) */
+.btn-primary:hover {
+  /* Target hover state specifically */
+  background-color: var(
+    --button-primary-hover-bg
+  ) !important; /* Darker purple hover from shared */
+  border-color: var(--button-primary-hover-bg) !important;
+  color: var(--button-primary-text) !important;
+}
+
+/* Outline Primary Button */
+.btn-outline-primary {
+  color: var(--bs-primary) !important; /* Use overridden BS primary */
+  border-color: var(--bs-primary) !important;
+}
+.btn-outline-primary:hover {
+  background-color: var(
+    --bs-primary
+  ) !important; /* Use overridden BS primary for background on hover */
+  color: var(--button-primary-text) !important; /* White text */
+}
+
+/* Outline Secondary Button */
+.btn-outline-secondary {
+  color: var(--secondary-text-color) !important;
+  border-color: var(--secondary-text-color) !important;
+}
+.btn-outline-secondary:hover {
+  background-color: var(--button-secondary-bg) !important;
+  color: var(--button-secondary-text) !important;
+}
+
+/* Fix hover text color for other Bootstrap outline buttons if used */
+.btn-outline-success:hover,
+.btn-outline-danger:hover,
+.btn-outline-info:hover {
+  color: white;
+}
+
+/* === Styles Copied from shared/components/_forms.css (Prioritized) === */
+.form-control {
+  border-radius: 6px; /* Shared */
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  padding: 0.5rem 1rem; /* Shared */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.form-control:focus {
+  border-color: var(--purple-primary); /* Shared focus color */
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25); /* Use overridden primary for focus shadow */
+  background-color: var(--input-bg);
+}
+.form-label {
+  font-weight: 500; /* Shared */
+  color: var(--bs-primary); /* Changed to primary purple */
+  margin-bottom: 0.5rem;
+}
+.input-group-text {
+  border: 1px solid var(--input-border);
+  background-color: var(--purple-lighter); /* Changed to light purple */
+  color: var(--bs-primary); /* Changed icon/text color to purple */
+  border-radius: 6px; /* Match form-control */
+  border-right: none; /* Remove border between addon and input */
+}
+.input-group > .input-group-text:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.input-group > .form-control:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none; /* Remove border between addon and input */
+}
+
+/* === Styles Copied from shared/components/_alerts.css (Prioritized) === */
+.alert {
+  border-radius: 8px; /* Shared */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Shared */
+  border-width: 0;
+  padding: 1rem 1.25rem;
+}
+/* Optional: Ensure icon alignment */
+.alert i {
+  margin-right: 0.5em;
+  vertical-align: middle; /* Align icon nicely with text */
+}
+/* Ensure alert-<color> uses overridden BS colors */
+.alert-primary {
+  color: var(--bs-primary); /* Use the text color derived by BS */
+  background-color: rgba(
+    var(--bs-primary-rgb),
+    0.1
+  ); /* Use a light purple background */
+  border-color: rgba(var(--bs-primary-rgb), 0.2); /* Optional border */
+}
+/* You might need similar overrides for .alert-success, .alert-danger etc. if their default look clashes */
+
+/* === Auth Specific Styles (Adjusted to use variables and match shared styles) === */
+
+/* --- Code Input Group (forgot-password, register) --- */
+.code-input-group {
+  display: flex;
+}
+.code-input-group .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 0;
+}
+.code-input-group .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-color: var(--input-border) !important;
+}
+/* Hover style is handled by .btn-outline-primary:hover above */
+
+/* --- Captcha (login) --- */
+.captcha-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.captcha-image {
+  height: calc(1.5em + 1rem + 2px);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+}
+.captcha-refresh {
+  cursor: pointer;
+  color: var(--bs-link-color); /* Use overridden link color */
+  transition: color 0.2s ease;
+  font-size: 1.1rem;
+}
+.captcha-refresh:hover {
+  color: var(--bs-link-hover-color); /* Use overridden link hover color */
+}
+
+/* --- Avatar Preview (register) --- */
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 3px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Cropper Modal (register) --- */
+.modal-cropper {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1050;
+  align-items: center;
+  justify-content: center;
+}
+.modal-cropper-content {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  color: var(--text-color);
+}
+.modal-cropper-content h4 {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+.modal-cropper-content p.text-muted {
+  color: var(--secondary-text-color) !important;
+  margin-bottom: 1rem;
+}
+.cropper-container {
+  margin: 1rem 0;
+  width: 100%;
+}
+#cropperImage {
+  max-width: 100%;
+  display: block;
+}
+/* Modal buttons use standard .btn styles now */
+
+/* Checkbox / Radio Styles */
+.form-check-input:checked {
+  background-color: var(--bs-primary) !important; /* Force purple background */
+  border-color: var(--bs-primary) !important; /* Force purple border */
+  /* Default white checkmark SVG should still be visible */
+}
+.form-check-input:focus {
+  border-color: var(--bs-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25) !important; /* Force purple focus shadow */
+}
+
+/* Utility Classes */
+/* .fade-out class removed */

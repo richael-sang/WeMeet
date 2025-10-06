@@ -1,0 +1,30 @@
+/* User Nav Active/Hover Styles (Moved from user/fragments/nav.html) */
+
+/* Active links */
+.navbar.navbar-dark .navbar-nav > .nav-item.active > .nav-link {
+  color: white !important; /* Ensure white text */
+  font-weight: 600 !important; /* Bold font */
+  background-color: #461b71 !important; /* Dark purple background (like admin's --purple-dark) */
+  border-radius: 4px !important; /* Match admin border radius */
+}
+
+/* Hover on non-active links */
+.navbar.navbar-dark .navbar-nav > .nav-item:not(.active) > .nav-link:hover {
+  color: white !important; /* Ensure white text on hover */
+  background-color: rgba(
+    70,
+    27,
+    113,
+    0.5
+  ) !important; /* Semi-transparent dark purple */
+  border-radius: 4px !important; /* Match admin border radius */
+}
+
+/* Non-active links */
+.navbar.navbar-dark .navbar-nav > .nav-item > .nav-link {
+  color: rgba(255, 255, 255, 0.75) !important; /* Slightly transparent white */
+  background-color: transparent !important; /* Ensure transparent background initially */
+  border-radius: 4px; /* Match admin border radius */
+  font-weight: normal;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out; /* Smooth transition */
+}

@@ -1,0 +1,143 @@
+/* Main User CSS Entry Point */
+
+/* Shared Base styles */
+@import url("../shared/base/_variables.css");
+@import url("../shared/base/_base.css");
+@import url("../shared/base/_utilities.css");
+@import url("../shared/base/_responsive.css");
+
+/* User-specific Base (if any in future) */
+/* @import url("base/..."); */
+
+/* Layout */
+@import url("layout/_navbar.css");
+@import url("../shared/layout/_layout.css"); /* Import shared layout styles */
+/* @import url("layout/..."); */
+
+/* Components */
+@import url("../shared/components/_buttons.css"); /* Use shared buttons */
+@import url("../shared/components/_alerts.css");
+@import url("../shared/components/_cards.css");
+@import url("../shared/components/_forms.css");
+@import url("../shared/components/_modals.css");
+@import url("../shared/components/_tables.css");
+@import url("components/_booking-badges.css"); /* Add import for booking badges */
+/* @import url("components/..."); */
+
+/* Page specific styles */
+@import url("pages/_meeting-rooms.css");
+@import url("pages/_my-bookings.css");
+@import url("pages/_index.css");
+@import url("pages/_notifications.css");
+/* @import url("pages/..."); */
+
+/* Additions for profile page consistency and dark mode */
+
+/* Dark Mode for Profile Tabs */
+.dark-mode .nav-tabs {
+  border-bottom-color: var(--border-color);
+}
+
+.dark-mode .nav-tabs .nav-link {
+  color: var(--secondary-text-color);
+  border-color: transparent transparent var(--border-color);
+}
+
+.dark-mode .nav-tabs .nav-link:hover,
+.dark-mode .nav-tabs .nav-link:focus {
+  border-color: transparent transparent var(--border-color);
+  color: var(--text-color);
+  isolation: isolate; /* Needed for z-index in Bootstrap 5 */
+}
+
+.dark-mode .nav-tabs .nav-link.active {
+  color: var(--link-color); /* Use brighter link color for active tab */
+  background-color: var(--card-bg);
+  border-color: var(--border-color) var(--border-color) var(--card-bg);
+}
+
+/* Dark Mode for Cropper Modal */
+.dark-mode .modal-cropper-content {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+.dark-mode .modal-cropper-content .text-muted {
+  color: var(--secondary-text-color) !important;
+}
+
+/* Style for the small avatar edit icon */
+.avatar-edit-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style for Accordion Button when Expanded (Light Mode Override) */
+.accordion-button:not(.collapsed) {
+  color: var(
+    --link-color
+  ); /* Use link color (purple in light mode from variables) */
+  background-color: rgba(
+    var(--purple-primary-rgb, 86, 43, 129),
+    0.1
+  ); /* Light purple tint */
+  /* Ensure box-shadow matches Bootstrap default or desired style */
+  box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0
+    var(--border-color); /* Using light mode border color */
+}
+/* Note: Bootstrap's default ::after (arrow) styling should work fine in light mode */
+
+/* Dark Mode for Accordion (e.g., in Help Modal) */
+.dark-mode .accordion-item {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.dark-mode .accordion-button {
+  background-color: transparent; /* Use transparent to inherit item background */
+  color: var(--text-color);
+}
+
+/* Style for the arrow icon in dark mode */
+.dark-mode .accordion-button::after {
+  /* Default Bootstrap uses background-image with SVG, 
+     we might need to adjust filter or use a different approach if default is not visible */
+  filter: brightness(0) invert(1); /* Common trick to invert icon color */
+}
+
+.dark-mode .accordion-button:not(.collapsed) {
+  background-color: rgba(
+    var(--purple-primary-rgb, 86, 43, 129),
+    0.1
+  ); /* Slightly tinted background when open */
+  color: var(--link-color); /* Brighter color when open */
+  box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0
+    var(--bs-accordion-border-color);
+}
+
+.dark-mode .accordion-button:not(.collapsed)::after {
+  filter: brightness(0) invert(1); /* Ensure icon remains visible when open */
+}
+
+.dark-mode .accordion-button:focus {
+  border-color: var(--link-color);
+  box-shadow: 0 0 0 0.25rem rgba(var(--link-color-rgb, 167, 139, 250), 0.5); /* Adjust focus ring color */
+}
+
+.dark-mode .accordion-body {
+  color: var(--text-color);
+}
+
+/* If needed: Adjust nested list/dl colors inside accordion body */
+.dark-mode .accordion-body ol,
+.dark-mode .accordion-body ul,
+.dark-mode .accordion-body dl {
+  color: var(--text-color);
+}
+
+.dark-mode .accordion-body dt {
+  color: var(--secondary-text-color); /* Slightly dimmer color for terms */
+}

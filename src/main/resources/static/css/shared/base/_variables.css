@@ -1,0 +1,68 @@
+:root {
+  /* Consistent purple variables (can be used in both modes or overridden) */
+  --purple-primary: rgb(86, 43, 129);
+  --purple-dark: rgb(70, 27, 113);
+  --purple-light: rgb(106, 63, 149);
+  --purple-lighter: rgba(
+    149,
+    105,
+    212,
+    0.1
+  ); /* Example for subtle backgrounds */
+
+  /* Light Mode Colors */
+  --bg-color: #ffffff; /* White background */
+  --text-color: #212529; /* Default Bootstrap dark text */
+  --secondary-text-color: #6c757d; /* Default Bootstrap muted text */
+  --border-color: #dee2e6; /* Default Bootstrap border */
+  --card-bg: #ffffff;
+  --container-bg: #ffffff; /* Add container bg for light mode (same as card) */
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --link-color: var(--purple-primary);
+  --link-hover-color: var(--purple-dark);
+  --table-stripe-bg: var(--purple-lighter);
+  --navbar-bg: var(--purple-primary); /* Keep navbar purple for now */
+  --navbar-text: #ffffff;
+  --button-primary-bg: var(--purple-primary);
+  --button-primary-text: #ffffff;
+  --button-primary-hover-bg: var(--purple-dark);
+  --button-secondary-bg: #6c757d;
+  --button-secondary-text: #ffffff;
+  --button-secondary-hover-bg: #5a6268;
+  --icon-color: var(--purple-primary);
+  --modal-header-bg: var(--purple-primary);
+  --modal-header-text: #ffffff;
+  --modal-close-button: #ffffff;
+}
+
+/* Dark Mode Colors - Applied via .dark-mode on <html> */
+.dark-mode {
+  --bg-color: #181818; /* Very Dark Neutral Gray */
+  --text-color: #eaeaea; /* Off-white / Very Light Gray */
+  --secondary-text-color: #a9a9a9; /* Medium Light Gray */
+  --border-color: #3e3e3e; /* Dark Gray Border */
+  --container-bg: #242424; /* Medium Dark Neutral Gray */
+  --card-bg: #2e2e2e; /* Lighter Neutral Gray */
+  --input-bg: #242424; /* Match container */
+  --input-border: #3e3e3e; /* Match border */
+  --link-color: #a78bfa; /* Brighter purple (Keep this for links) */
+  --link-hover-color: #c4b5fd; /* Even brighter purple (Keep this for link hover) */
+  --table-stripe-bg: rgba(255, 255, 255, 0.05); /* Subtle light stripe */
+  --navbar-bg: #181818; /* Match base background */
+  --navbar-text: #eaeaea; /* Match base text */
+  --button-primary-bg: var(
+    --purple-primary
+  ); /* Use the original deep purple for primary buttons in dark mode too */
+  --button-primary-text: #ffffff;
+  --button-primary-hover-bg: var(
+    --purple-dark
+  ); /* Use the darker deep purple for hover */
+  --button-secondary-bg: #3e3e3e; /* Keep Dark Gray Border Color */
+  --button-secondary-text: #eaeaea;
+  --button-secondary-hover-bg: #505050; /* Keep Slightly lighter gray */
+  --icon-color: #a78bfa; /* Keep icon color matching link color */
+  --modal-header-bg: var(--purple-primary); /* Use the original deep purple */
+  --modal-header-text: #ffffff; /* Ensure text is white/light for contrast */
+  --modal-close-button: #ffffff; /* Ensure close button is visible */
+}

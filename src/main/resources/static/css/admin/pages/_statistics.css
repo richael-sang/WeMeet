@@ -1,0 +1,88 @@
+/* Statistics Page Specific Styles from style.css */
+.progress {
+  height: 20px;
+  border-radius: 5px;
+}
+
+.progress .progress-bar {
+  /* Keep the text shadow or adjust as needed for purple theme */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Add other statistics-specific styles here */
+
+/* Styles moved from statistics.html inline <style> block */
+.stats-card {
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  border: none;
+  height: 100%;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stats-icon {
+  font-size: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.stats-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.stats-title {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Adjust specific stats number colors */
+.stats-number.text-info,
+.stats-number.text-success {
+  /* Only target Daily Average, Approved uses specific classes */
+  color: var(--purple-primary) !important; /* Override Bootstrap classes */
+}
+
+/* Adjust icon background for info/success stats */
+.stats-icon.bg-info,
+.stats-icon.bg-success {
+  background-color: var(--purple-lighter) !important;
+}
+
+/* Style table header */
+thead.table-light {
+  background-color: white !important;
+  border-bottom: 2px solid var(--purple-primary);
+}
+
+/* Style the Detailed Statistics title */
+h2.mt-5 {
+  color: var(--purple-primary);
+  font-weight: 700;
+}
+
+/* Added from style.css */
+.table td {
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05); /* Light blue hover */
+}

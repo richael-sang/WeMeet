@@ -1,0 +1,122 @@
+/* Table Styles from settings.html <style> */
+thead {
+  border-bottom: 2px solid var(--purple-primary);
+  background-color: var(--purple-lighter);
+}
+thead th {
+  color: var(--purple-primary);
+  font-weight: 600;
+  background-color: var(--card-bg) !important;
+  border-bottom: 2px solid var(--purple-primary);
+  color: var(--text-color);
+}
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: var(--table-stripe-bg);
+}
+
+/* Styles from users-management.html & user-actions-log.html */
+thead.thead-purple {
+  background-color: var(--purple-primary); /* Force purple background always */
+  color: #ffffff; /* Set default text color to white */
+  border-bottom: none;
+}
+
+thead.thead-purple th {
+  /* Ensure direct th text is also white */
+  color: #ffffff !important; /* Use !important to override other potential rules if needed */
+  /* Keep background transparent or inherit from thead */
+  background-color: transparent !important;
+  /* Remove conflicting border if any */
+  border-bottom: none;
+}
+
+thead.thead-purple th a {
+  color: #ffffff; /* Force link color to white always */
+  text-decoration: none;
+}
+
+thead.thead-purple th a:hover {
+  color: rgba(255, 255, 255, 0.8); /* Lighter white/grey for hover */
+}
+
+.table-striped-purple tbody tr:nth-of-type(odd) {
+  background-color: var(--table-stripe-bg);
+}
+
+.table-striped-purple tbody tr:nth-of-type(even) {
+  background-color: var(--card-bg);
+}
+
+/* General table adjustments */
+.table {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+.table th,
+.table td {
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+/* Add hover effect */
+.table-hover > tbody > tr:hover > *,
+.table-hover > tbody > tr:hover {
+  /* Apply hover color using variable or specific value */
+  background-color: rgba(0, 0, 0, 0.075); /* Default Bootstrap light hover */
+}
+
+.dark-mode .table-hover > tbody > tr:hover > *,
+.dark-mode .table-hover > tbody > tr:hover {
+  background-color: rgba(255, 255, 255, 0.08); /* Subtle hover for dark mode */
+  color: var(--text-color); /* Ensure text color remains readable */
+}
+
+/* Table Column Specific Styles */
+.table th.col-id,
+.table td.col-id {
+  width: 60px; /* Fixed small width for ID */
+  text-align: center; /* Center align ID */
+  white-space: nowrap;
+}
+
+.table th.col-role,
+.table td.col-role,
+.table th.col-status,
+.table td.col-status,
+.table th.col-actions,
+.table td.col-actions {
+  text-align: center; /* Center align common columns */
+  white-space: nowrap;
+}
+
+.table th.col-email,
+.table td.col-email {
+  word-break: break-word; /* Keep word break for long emails */
+}
+
+.table th.col-timestamp,
+.table td.col-timestamp {
+  min-width: 150px;
+  white-space: nowrap;
+}
+
+.table th.col-admin,
+.table td.col-admin,
+.table th.col-action,
+.table td.col-action,
+.table th.col-target,
+.table td.col-target {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.table th.col-reason,
+.table td.col-reason {
+  word-break: break-word;
+  min-width: 200px;
+}
+
+/* Ensure table body text is light in dark mode */
+.dark-mode .table > tbody > tr > td {
+  color: var(--text-color);
+}

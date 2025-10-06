@@ -1,0 +1,60 @@
+/* Styles specific to index.html (User Dashboard) */
+
+/* Using shared variables from _variables.css */
+
+/* Base Card Styles (consolidated) */
+.card {
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Card hover effect */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Card specific styles (inherits from .card) */
+.admin-card {
+  /* Renaming this to something more generic like .dashboard-card might be better */
+  height: 100%;
+}
+
+/* Card Icon styles */
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--icon-color); /* Use variable */
+}
+
+/* User Welcome Area */
+.user-welcome {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+/* Dark Mode specific overrides for this page */
+html.dark-mode .user-welcome {
+  background-color: #495057;
+}
+
+/* Button Styles specific overrides or additions for this page */
+/* Note: Base button styles are likely in shared base/utilities */
+/* .btn-primary ... if different from base */
+
+/* Make dashboard card icons always dark purple */
+.admin-card .card-icon {
+  color: var(--purple-primary) !important; /* Override dark mode --icon-color */
+  /* You might need to adjust the size or margin if needed */
+  /* font-size: 3rem; */
+  /* margin-bottom: 1rem; */
+}
+
+/* Add any other specific styles for the user index page below */

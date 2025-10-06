@@ -1,0 +1,101 @@
+<!-- Global navigation bar template for all Admin pages -->
+<!-- Simplified navigation bar for the Dashboard -->
+<div th:fragment="dashboard_nav">
+  <div
+    th:replace="~{admin/fragments/nav :: admin_nav('dashboard', false)}"
+  ></div>
+</div>
+
+<!-- Unified navigation bar template for all Admin pages -->
+<!-- Use the showMainNav parameter to control the visibility of the main navigation links -->
+<!-- Use the active parameter to control the current active item -->
+<div th:fragment="admin_nav(active, showMainNav)">
+  <nav
+    class="navbar navbar-expand-lg navbar-dark"
+    style="background-color: rgb(86, 43, 129)"
+  >
+    <div class="container">
+      <a class="navbar-brand" th:href="@{/dashboard}">
+        <i class="fas fa-calendar-check me-2"></i>WeMeet
+      </a>
+
+      <!-- Container for main navigation links - always present -->
+      <div class="navbar-nav me-auto">
+        <!-- Render internal links only when needed (showMainNav is true) -->
+        <th:block th:if="${showMainNav == true}">
+          <li
+            class="nav-item"
+            th:classappend="${active == 'rooms' ? 'active' : ''}"
+          >
+            <a class="nav-link" th:href="@{/admin/rooms}">
+              <i class="fas fa-door-open me-1"></i>Rooms
+            </a>
+          </li>
+          <li
+            class="nav-item"
+            th:classappend="${active == 'bookings' ? 'active' : ''}"
+          >
+            <a class="nav-link" th:href="@{/admin/bookings}">
+              <i class="fas fa-calendar-alt me-1"></i>Bookings
+            </a>
+          </li>
+          <li
+            class="nav-item"
+            th:classappend="${active == 'users' ? 'active' : ''}"
+          >
+            <a class="nav-link" th:href="@{/admin/users}">
+              <i class="fas fa-users me-1"></i>Users
+            </a>
+          </li>
+          <li
+            class="nav-item"
+            th:classappend="${active == 'statistics' ? 'active' : ''}"
+          >
+            <a class="nav-link" th:href="@{/admin/statistics}">
+              <i class="fas fa-chart-line me-1"></i>Statistics
+            </a>
+          </li>
+        </th:block>
+      </div>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <span class="nav-link text-white" th:text="${adminName}"
+              >Admin Name</span
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/logout}">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </li>
+          <li
+            class="nav-item"
+            th:classappend="${active == 'settings' ? 'active' : ''}"
+          >
+            <a class="nav-link" th:href="@{/admin/settings}" title="Settings">
+              <i class="fas fa-cog"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="theme-toggle-button">
+              <i class="fas fa-moon"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>

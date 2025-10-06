@@ -1,0 +1,110 @@
+/* Card Styles from settings.html <style> */
+.card {
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem; /* Add consistent spacing */
+}
+.card-header {
+  background: linear-gradient(
+    to right,
+    var(--purple-primary),
+    var(--purple-light)
+  );
+  color: var(--navbar-text); /* Use navbar text color for header */
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.card-header h5 {
+  color: var(--navbar-text);
+}
+
+/* Styles from dashboard.html */
+.admin-card {
+  transition: transform 0.3s;
+  /* margin-bottom: 20px; /* Let default card margin handle this or adjust globally */
+}
+.admin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Consider making shadow consistent */
+}
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--purple-primary);
+}
+
+/* Added/Updated from meeting-rooms-management.html */
+/* Consolidate common card styles */
+.card {
+  border: none;
+  border-radius: 10px; /* Prefer this radius */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Prefer this shadow */
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem; /* Keep consistent spacing from settings */
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); /* Darker shadow on hover */
+}
+
+.card-header {
+  /* Use gradient from rooms */
+  background: linear-gradient(
+    to right,
+    var(--purple-primary),
+    var(--purple-light)
+  );
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 1rem 1.25rem;
+  border-top-left-radius: 10px; /* Match card radius */
+  border-top-right-radius: 10px; /* Match card radius */
+}
+
+.card-header h5 {
+  color: white;
+  margin-bottom: 0; /* Remove default margin */
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  background-color: rgba(0, 0, 0, 0.02); /* Maybe make this a variable later */
+  border-top: 1px solid var(--border-color);
+  padding: 1rem 1.25rem;
+}
+
+/* Add explicit dark mode rules */
+.dark-mode .card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-color); /* Ensure text inside card is readable */
+}
+
+/* Restore purple gradient header for dark mode */
+.dark-mode .card-header {
+  background: linear-gradient(
+    to right,
+    var(--purple-primary),
+    var(--purple-dark)
+  );
+  color: #ffffff;
+}
+.dark-mode .card-header h5 {
+  color: #ffffff;
+}
+
+.dark-mode .card-footer {
+  background-color: var(
+    --container-bg
+  ); /* Match header or use a specific footer color */
+  border-top-color: var(--border-color);
+}

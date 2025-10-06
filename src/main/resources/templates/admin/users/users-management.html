@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management - WeMeet</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Link to the new central admin CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}" />
+    <!-- Removed inline styles and old CSS links -->
+  </head>
+  <body>
+    <!-- Use unified navigation bar -->
+    <div
+      th:replace="~{admin/fragments/nav :: admin_nav(active='users', showMainNav=true)}"
+    ></div>
+
+    <div class="container py-4">
+      <!-- New Header -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="page-title">
+              <i class="fas fa-users me-2"></i> User Management
+            </h2>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a th:href="@{/admin/user-action-logs}" class="btn btn-primary">
+              <!-- Changed audit-logs/list URL -->
+              <i class="fas fa-history me-1"></i>View Audit Logs
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search/Filter Area in Content Container -->
+      <div class="content-container mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-filter me-2 icon-purple"></i>Filter Users
+          </h5>
+          <a th:href="@{/admin/users}" class="btn btn-sm btn-light">
+            <i class="fas fa-redo me-1"></i>Reset Filters
+          </a>
+        </div>
+        <form th:action="@{/admin/users}" method="get" class="row g-3">
+          <div class="col-md-4 mb-2">
+            <label for="search" class="form-label small text-muted"
+              >Username or Email</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="search"
+              name="search"
+              th:value="${search}"
+              placeholder="Search..."
+            />
+          </div>
+          <div class="col-md-3 mb-2">
+            <!-- Adjusted grid size -->
+            <label for="role" class="form-label small text-muted">Role</label>
+            <select class="form-select form-control" id="role" name="role">
+              <option value="">All Roles</option>
+              <option value="ADMIN" th:selected="${role == 'ADMIN'}">
+                Admin
+              </option>
+              <option value="USER" th:selected="${role == 'USER'}">User</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-2">
+            <!-- Adjusted grid size -->
+            <label for="status" class="form-label small text-muted"
+              >Status</label
+            >
+            <select class="form-select form-control" id="status" name="status">
+              <option value="">All Status</option>
+              <option value="active" th:selected="${status == 'active'}">
+                Active
+              </option>
+              <option value="locked" th:selected="${status == 'locked'}">
+                Locked
+              </option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end mb-2">
+            <!-- Adjusted grid size -->
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-filter me-1"></i>Apply Filter
+            </button>
+          </div>
+          <!-- Hidden sorting fields -->
+          <input type="hidden" name="sort" th:value="${sort}" />
+          <input type="hidden" name="dir" th:value="${dir}" />
+        </form>
+      </div>
+
+      <!-- User List in Content Container -->
+      <div class="content-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-list me-2 icon-purple"></i>Users List
+          </h5>
+          <span
+            class="badge bg-purple"
+            th:text="${usersPage.totalElements + ' Users'}"
+            >0 Users</span
+          >
+        </div>
+
+        <div class="table-responsive table-responsive-rounded">
+          <table class="table table-striped-purple table-hover mb-0">
+            <!-- Applied new classes -->
+            <thead class="thead-purple">
+              <!-- Applied new class -->
+              <tr>
+                <th class="col-id">
+                  <a
+                    th:href="@{/admin/users(sort='id', dir=${sort == 'id' and dir == 'asc' ? 'desc' : 'asc'}, search=${search}, role=${role}, status=${status})}"
+                  >
+                    ID
+                  </a>
+                </th>
+                <th class="col-username">
+                  <a
+                    th:href="@{/admin/users(sort='username', dir=${sort == 'username' and dir == 'asc' ? 'desc' : 'asc'}, search=${search}, role=${role}, status=${status})}"
+                  >
+                    Username
+                  </a>
+                </th>
+                <th class="col-email">
+                  <a
+                    th:href="@{/admin/users(sort='email', dir=${sort == 'email' and dir == 'asc' ? 'desc' : 'asc'}, search=${search}, role=${role}, status=${status})}"
+                  >
+                    Email
+                  </a>
+                </th>
+                <th class="col-role">Role</th>
+                <th class="col-status">Status</th>
+                <th class="col-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${usersPage.content.size() == 0}">
+                <td colspan="6" class="text-center py-4">
+                  <!-- Adjusted colspan -->
+                  No users found matching your criteria
+                </td>
+              </tr>
+              <tr th:each="user : ${usersPage.content}">
+                <td class="col-id" th:text="${user.id}">1</td>
+                <td class="col-username">
+                  <img
+                    th:src="${user.avatar != null ? user.avatar : '/images/default_avatar.jpeg'}"
+                    alt="User Avatar"
+                    class="user-avatar"
+                  />
+                  <span th:text="${user.username}">Username</span>
+                </td>
+                <td class="col-email" th:text="${user.email}">
+                  user@example.com
+                </td>
+                <td class="col-role" th:text="${user.role}">Role</td>
+                <td class="col-status">
+                  <span
+                    th:if="${user.isLocked}"
+                    class="status-badge status-locked"
+                    >Locked</span
+                  >
+                  <span
+                    th:unless="${user.isLocked}"
+                    class="status-badge status-active"
+                    >Active</span
+                  >
+                </td>
+                <td class="col-actions">
+                  <div class="btn-group btn-group-sm">
+                    <button
+                      th:if="${!user.isLocked}"
+                      type="button"
+                      class="btn btn-sm btn-outline-danger lock-user-btn"
+                      th:data-user-id="${user.id}"
+                      th:data-username="${user.username}"
+                      title="Lock User"
+                    >
+                      <i class="fas fa-lock"></i>
+                    </button>
+                    <button
+                      th:if="${user.isLocked}"
+                      type="button"
+                      class="btn btn-sm btn-outline-success unlock-user-btn"
+                      th:data-user-id="${user.id}"
+                      th:data-username="${user.username}"
+                      title="Unlock User"
+                    >
+                      <i class="fas fa-unlock"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" th:if="${usersPage.totalPages > 0}">
+          <div>
+            <!-- Previous Button -->
+            <a
+              class="btn btn-sm btn-outline-secondary"
+              th:if="${!usersPage.first}"
+              th:href="@{/admin/users(page=${usersPage.number - 1}, size=${usersPage.size}, sort=${sort}, dir=${dir}, search=${search}, role=${role}, status=${status})}"
+              >&laquo; Prev</a
+            >
+            <span
+              th:unless="${usersPage.first}"
+              class="btn btn-sm btn-outline-secondary disabled"
+              >&laquo; Prev</span
+            >
+
+            <!-- Page Numbers -->
+            <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+              <!-- Using startPage and endPage -->
+              <a
+                class="btn btn-sm"
+                th:classappend="${i == usersPage.number} ? 'btn-primary' : 'btn-outline-secondary'"
+                th:href="@{/admin/users(page=${i}, size=${usersPage.size}, sort=${sort}, dir=${dir}, search=${search}, role=${role}, status=${status})}"
+                th:text="${i + 1}"
+              ></a>
+            </span>
+
+            <!-- Next Button -->
+            <a
+              class="btn btn-sm btn-outline-secondary"
+              th:if="${!usersPage.last}"
+              th:href="@{/admin/users(page=${usersPage.number + 1}, size=${usersPage.size}, sort=${sort}, dir=${dir}, search=${search}, role=${role}, status=${status})}"
+              >Next &raquo;</a
+            >
+            <span
+              th:unless="${usersPage.last}"
+              class="btn btn-sm btn-outline-secondary disabled"
+              >Next &raquo;</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Success message -->
+      <div
+        id="successMessage"
+        class="alert alert-success mt-3"
+        style="display: none"
+      ></div>
+      <!-- Use alert class -->
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Load the renamed module -->
+    <script
+      type="module"
+      src="/scripts/admin/pages/users-management.js"
+    ></script>
+    <script th:src="@{/scripts/shared/theme.js}"></script>
+  </body>
+</html>

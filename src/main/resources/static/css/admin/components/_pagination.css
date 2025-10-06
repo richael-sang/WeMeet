@@ -1,0 +1,15 @@
+/* Pagination Styles from users-management.html & user-actions-log.html */
+.pagination-container {
+  padding: 1rem 0 0 0;
+  text-align: center;
+  border-top: none; /* Removed top border */
+}
+
+.pagination-container .btn {
+  margin: 0 3px; /* Use btn class for consistency */
+}
+
+/* Style for the active page button (already handled by .btn-primary) */
+/* .pagination-container span[style*="font-weight: bold"] { */
+/*   color: var(--purple-primary); */
+/* } */

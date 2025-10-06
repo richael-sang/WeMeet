@@ -1,0 +1,126 @@
+<!-- Temporary inline styles for user navigation to match admin active state -->
+<style>
+  /* User Nav Active/Hover Styles (Mimicking Admin) */
+
+  /* Active links */
+  .navbar.navbar-dark .navbar-nav > .nav-item.active > .nav-link {
+    color: white !important; /* Ensure white text */
+    font-weight: 600 !important; /* Bold font */
+    background-color: #461B71 !important; /* Dark purple background (like admin's --purple-dark) */
+    border-radius: 4px !important; /* Match admin border radius */
+  }
+
+  /* Hover on non-active links */
+  .navbar.navbar-dark .navbar-nav > .nav-item:not(.active) > .nav-link:hover {
+    color: white !important; /* Ensure white text on hover */
+    background-color: rgba(70, 27, 113, 0.5) !important; /* Semi-transparent dark purple */
+    border-radius: 4px !important; /* Match admin border radius */
+  }
+
+  /* Non-active links */
+  .navbar.navbar-dark .navbar-nav > .nav-item > .nav-link {
+    color: rgba(255, 255, 255, 0.75) !important; /* Slightly transparent white */
+    background-color: transparent !important; /* Ensure transparent background initially */
+    border-radius: 4px; /* Match admin border radius */
+    font-weight: normal;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out; /* Smooth transition */
+  }
+
+</style>
+
+<!-- Global navigation bar template for all User pages -->
+<!-- Simplified navigation bar for the User Dashboard -->
+<div th:fragment="dashboard_nav">
+  <div
+    th:replace="~{user/fragments/nav :: user_nav('dashboard', false)}"
+  ></div>
+</div>
+
+<!-- Unified navigation bar template for all User pages -->
+<!-- Use the showMainNav parameter to control the visibility of the main navigation links -->
+<!-- Use the active parameter to control the current active item -->
+<!-- Updated to match admin color */ -->
+<div th:fragment="user_nav(active, showMainNav)">
+  <nav
+    class="navbar navbar-expand-lg navbar-dark"
+    style="background-color: rgb(86, 43, 129)">
+    <div class="container">
+      <a class="navbar-brand" th:href="@{/user/dashboard}">
+        <i class="fas fa-calendar-check me-2"></i>WeMeet
+      </a>
+
+      <!-- Container for main navigation links - conditionally rendered -->
+      <div class="navbar-nav me-auto" th:if="${showMainNav == true}">
+        <!-- Render internal links only when needed (showMainNav is true) -->
+        <li
+          class="nav-item"
+          th:classappend="${active == 'rooms' ? 'active' : ''}"
+        >
+          <a class="nav-link" th:href="@{/user/rooms}">
+            <i class="fas fa-door-open me-1"></i>Meeting Rooms
+          </a>
+        </li>
+        <li
+          class="nav-item"
+          th:classappend="${active == 'bookings' ? 'active' : ''}"
+        >
+          <a class="nav-link" th:href="@{/user/bookings}">
+            <i class="fas fa-calendar-check me-1"></i>My Bookings
+          </a>
+        </li>
+        <li
+          class="nav-item"
+          th:classappend="${active == 'notifications' ? 'active' : ''}"
+        >
+          <a class="nav-link position-relative" th:href="@{/user/notifications}">
+            <i class="fas fa-bell me-1"></i>Notifications
+            <span th:if="${hasUnreadNotifications}"
+                  class="position-absolute top-0 start-100 translate-middle notification-dot">
+              <span class="visually-hidden">New notifications</span>
+            </span>
+          </a>
+        </li>
+      </div>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#userNavbarNav"
+        aria-controls="userNavbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="userNavbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item" th:classappend="${active == 'profile' ? 'active' : ''}">
+            <!-- Modify this line to include icon and link -->
+            <a class="nav-link text-white" th:href="@{/user/profile}">
+                <i class="fas fa-user me-1"></i><span th:text="${userName}">User Name</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/logout}">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </li>
+          <li
+            class="nav-item"
+            th:classappend="${active == 'help' ? 'active' : ''}"
+          >
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#helpModal" title="Help Center">
+              <i class="fas fa-question-circle"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="theme-toggle-button">
+              <i class="fas fa-sun"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div> 

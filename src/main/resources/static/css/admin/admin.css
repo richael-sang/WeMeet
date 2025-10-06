@@ -1,0 +1,26 @@
+/* Main Admin CSS Entry Point */
+
+/* Base styles */
+@import url("../shared/base/_variables.css");
+@import url("../shared/base/_base.css");
+@import url("../shared/base/_utilities.css");
+@import url("../shared/base/_responsive.css");
+
+/* Layout */
+@import url("../shared/layout/_layout.css");
+@import url("layout/_navbar.css"); /* Includes nav pills for now */
+
+/* Components */
+@import url("../shared/components/_buttons.css"); /* Use shared buttons */
+@import url("../shared/components/_cards.css");
+@import url("../shared/components/_forms.css");
+@import url("../shared/components/_tables.css");
+@import url("../shared/components/_modals.css");
+@import url("components/_badges.css");
+@import url("../shared/components/_alerts.css");
+@import url("components/_pagination.css");
+
+/* Page specific styles */
+@import url("pages/_statistics.css");
+
+/* Add imports for any other component or page-specific CSS files below */

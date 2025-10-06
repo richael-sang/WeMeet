@@ -1,0 +1,79 @@
+/* Styles for Booking Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 1rem; /* Rounded badge */
+  font-size: 0.85em;
+  text-align: center;
+  min-width: 80px; /* Ensure badges have a minimum width */
+}
+
+/* Approved Status (Green) - Using specific hex colors */
+.status-approved {
+  background-color: #d1e7dd; /* Light Green */
+  color: #0f5132; /* Dark Green */
+}
+
+/* Canceled Status (Purple) - Using specific hex colors */
+.status-canceled {
+  background-color: #e2d9f3; /* Light Purple */
+  color: #59359a; /* Dark Purple */
+}
+
+/* Rejected Status (Red) - Using specific hex colors */
+.status-rejected {
+  background-color: #f8d7da; /* Light Red */
+  color: #842029; /* Dark Red */
+}
+
+/* Custom Button Styles for My Bookings Actions */
+.btn-custom-modify {
+  background-color: rgb(226 217 243); /* Light purple background */
+  color: var(--purple-primary); /* Purple text */
+  border-color: var(--purple-primary); /* Purple border */
+}
+
+.btn-custom-modify:hover {
+  background-color: var(
+    --purple-light
+  ); /* Use slightly darker purple variable */
+  color: #ffffff; /* White text on hover */
+  border-color: var(--purple-primary); /* Keep purple border */
+}
+
+.btn-custom-cancel-primary {
+  background-color: var(--purple-primary); /* Use the primary purple variable */
+  color: #ffffff;
+  border-color: var(--purple-primary); /* Match border */
+}
+
+.btn-custom-cancel-primary:hover {
+  /* Slightly darken the primary purple on hover */
+  filter: brightness(90%);
+  color: #ffffff !important; /* Ensure text stays white on hover */
+}
+
+.btn-outline-custom-purple:hover {
+  color: #ffffff; /* Text color becomes white */
+  background-color: var(
+    --purple-primary
+  ); /* Background becomes primary purple */
+  border-color: var(--purple-primary); /* Border stays primary purple */
+}
+
+/* Custom Badge Style for Notifications Count */
+.badge-custom-white-purple {
+  background-color: #ffffff; /* White background */
+  color: var(--purple-primary); /* Primary purple text */
+  border: 1px solid var(--purple-light); /* Optional: Add a light purple border */
+}
+
+/* Style for the small red notification dot */
+.notification-dot {
+  /* Use padding for size control */
+  padding: 0.3rem; /* Adjust size here */
+  background-color: var(--bs-danger); /* Bootstrap danger color (red) */
+  border: 1px solid var(--bs-danger); /* Red border */
+  border-radius: 50%; /* Make it a circle */
+  /* Removed fixed width/height for padding-based sizing */
+}

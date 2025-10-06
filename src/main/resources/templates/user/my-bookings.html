@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookings - WeMeet</title>
+    <!-- Updated Title -->
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- Flatpickr CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <!-- Link to main user CSS -->
+    <link rel="stylesheet" th:href="@{/css/user/user.css}" />
+
+    <script>
+      // Immediately set the theme class based on localStorage to prevent FOUC
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark-mode");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Include User Navigation Bar - Set 'bookings' as active (hardcoded) -->
+    <div th:replace="~{user/fragments/nav :: user_nav('bookings', true)}"></div>
+
+    <div class="container py-4">
+      <!-- Apply page-header structure -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-12">
+            <h1 class="page-title mb-0">
+              <i class="fas fa-calendar-alt me-2"></i>
+              <!-- Optional icon -->
+              My Bookings
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Reservations Section -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-calendar-check me-2"></i>My Bookings List
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Refresh button is optional now as it loads on page load -->
+          <!-- <button class="btn btn-primary mb-3" onclick="getMyReservations()">刷新列表</button> -->
+          <div id="listMessagesArea" class="mb-3"></div>
+          <div id="bookingDisplayArea">
+            <div id="reservationsResults">
+              <p>Loading your bookings...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create/Modify Reservation Section (Card always visible) -->
+      <div class="card mb-4" id="bookingFormCard">
+        <div class="card-header bg-warning text-dark">
+          <!-- Changed color for emphasis -->
+          <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Modify Booking</h5>
+        </div>
+        <div class="card-body">
+          <p id="bookingFormPlaceholder" class="text-muted">
+            Click the 'Modify' button on an item in the list above to load
+            booking details and make changes.
+          </p>
+          <div id="bookingFormContent" style="display: none">
+            <!-- Wrapper for form content -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label for="username" class="form-label">User:</label>
+                  <input
+                    type="text"
+                    id="username"
+                    class="form-control"
+                    th:value="${user?.username ?: ''}"
+                    readonly
+                  />
+                  <input
+                    type="hidden"
+                    id="userId"
+                    th:value="${user?.id ?: ''}"
+                  />
+                </div>
+                <div class="form-group mb-3">
+                  <label for="roomName" class="form-label">Room:</label>
+                  <input
+                    type="text"
+                    id="roomName"
+                    class="form-control"
+                    placeholder="Select a room from the search results"
+                    readonly
+                  />
+                  <input type="hidden" id="roomId" />
+                </div>
+                <div class="form-group mb-3">
+                  <label for="topic" class="form-label">Topic:</label>
+                  <input
+                    type="text"
+                    id="topic"
+                    class="form-control"
+                    value="Team Meeting"
+                    required
+                  />
+                  <small class="orm-text text-muted fs-7 d-block">
+                    you can modify the topic as you wish
+                  </small>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label for="date" class="form-label">Date:</label>
+                  <input
+                    type="date"
+                    id="date"
+                    class="form-control"
+                    required
+                    onchange="updateTimeSlots()"
+                  />
+                  <small class="orm-text text-muted fs-7 d-block">
+                    you can feel free to modify a suitable date for yourself
+                  </small>
+                </div>
+                <div class="time-slot-container">
+                  <div class="time-slot-header">
+                    <h5 class="mb-0">Select Time Slot</h5>
+                    <span id="selected-time-range"></span>
+                  </div>
+                  <div class="time-slot-grid" id="timeSlotGrid"></div>
+                  <div class="time-labels" id="timeLabels"></div>
+                </div>
+                <div class="form-group mb-3">
+                  <label for="startTime" class="form-label">Start Time:</label>
+                  <input
+                    type="time"
+                    id="startTime"
+                    class="form-control"
+                    required
+                    readonly
+                  />
+                </div>
+                <div class="form-group mb-3">
+                  <label for="endTime" class="form-label">End Time:</label>
+                  <input
+                    type="time"
+                    id="endTime"
+                    class="form-control"
+                    required
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="handleReservationSubmit()">
+              Submit Changes
+            </button>
+            <button class="btn btn-secondary ms-2" onclick="resetBookingForm()">
+              Cancel Changes
+            </button>
+            <div id="reservationResult" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Your custom scripts (Copied from portal.html, ensure all needed functions are present) -->
+    <script th:inline="javascript">
+      // API URL
+      const apiUrl = /*[[@{/api}]]*/ "/api";
+      let currentModifyingReservationId = null;
+
+      // 页面加载时初始化
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("[DOMContentLoaded] Initializing my-bookings.html...");
+        const today = new Date();
+        const dateInput = document.getElementById("date");
+
+        // 设置最小日期为今天
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        if (dateInput) dateInput.min = `${yyyy}-${mm}-${dd}`;
+        // Don't set initial date value here, let modifyReservation handle it
+
+        // 初始化时间槽和样式
+        // updateTimeSlotStyles(); // REMOVED - Use external CSS
+        initializeTimeSlots();
+
+        // 设置初始用户 - Use safe navigation ?. and default values
+        const userId = /*[[${user?.id}]]*/ null;
+        const username = /*[[${user?.username}]]*/ "Anonymous User";
+        if (userId !== null) {
+          document.getElementById("userId").value = userId;
+          document.getElementById("username").value = username;
+          // Fetch reservations for the logged-in user
+          getMyReservations();
+        } else {
+          document.getElementById("username").placeholder =
+            "Please log in first";
+          document.getElementById(
+            "bookingDisplayArea"
+          ).innerHTML = `<div class="alert alert-warning">Please log in to view your bookings.</div>`;
+        }
+
+        // Test connection (optional on this page)
+        // testConnection();
+      });
+
+      // --- Functions related to My Bookings List & Modify Form ---
+
+      // Handle Submit (only Modify is expected here)
+      function handleReservationSubmit() {
+        if (currentModifyingReservationId) {
+          submitModifyReservation();
+        } else {
+          // Should not happen from this page's UI flow, but handle defensively
+          console.error(
+            "Attempted to create reservation from my-bookings page."
+          );
+          displayMessage(
+            "reservationResult",
+            "This page is only for modifying existing bookings.",
+            "danger"
+          );
+        }
+      }
+
+      // 获取我的预订 (Same as portal.html but called on load)
+      function getMyReservations() {
+        const userId = document.getElementById("userId").value;
+        if (!userId || userId === "null") {
+          const displayArea = document.getElementById("bookingDisplayArea");
+          if (displayArea) {
+            displayArea.innerHTML = `
+                    <div class="alert alert-warning">Could not get user ID, please ensure you are logged in.</div>
+                `;
+          }
+          return;
+        }
+
+        // Add Authorization header if needed (assuming session-based auth for now)
+        const headers = {};
+        /* Example for token auth:
+        const token = localStorage.getItem("auth_token");
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        } else {
+          console.error("getMyReservations: No auth token found.");
+          document.getElementById("reservationsResults").innerHTML = `<div class="alert alert-danger">需要登录才能查看预订。</div>`;
+          return;
+        }
+        */
+
+        console.log(`Fetching reservations for user ID: ${userId}`);
+        fetch(`${apiUrl}/reservations/user/${userId}`, { headers: headers })
+          .then((response) => {
+            console.log("Get reservations response status:", response.status);
+            if (response.status === 401 || response.status === 403) {
+              throw new Error(`Authentication failed (${response.status})`);
+            }
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            displayReservations(data);
+          })
+          .catch((error) => {
+            const displayArea = document.getElementById("bookingDisplayArea");
+            if (displayArea) {
+              displayArea.innerHTML = `
+                        <div class="alert alert-danger">Error fetching bookings: ${error.message}</div>
+                    `;
+            }
+            console.error("Error fetching bookings:", error);
+          });
+      }
+
+      // 显示预订列表 (Now renders inside bookingDisplayArea)
+      function displayReservations(reservations) {
+        const displayArea = document.getElementById("bookingDisplayArea");
+        if (!displayArea) return;
+
+        let tableHtml = "<p>No bookings found</p>"; // Default message
+
+        // Filter out PENDING bookings before displaying
+        const filteredReservations = reservations.filter(
+          (reservation) => reservation.status !== "PENDING"
+        );
+
+        if (filteredReservations && filteredReservations.length > 0) {
+          tableHtml = `
+                <table class="table table-striped">
+                <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Room</th>
+                            <th>Topic</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+          filteredReservations.forEach((reservation) => {
+            // Normalize status: trim whitespace and convert to uppercase
+            const statusUpper = reservation.status?.trim().toUpperCase();
+            let statusClass = "status-badge"; // Start with the base class
+
+            // Append specific status class based on normalized status
+            if (statusUpper === "APPROVED") {
+              statusClass += " status-approved";
+            } else if (statusUpper === "CANCELLED") {
+              statusClass += " status-canceled";
+            } else if (statusUpper === "REJECTED") {
+              statusClass += " status-rejected";
+            }
+
+            // Determine if buttons should be shown (use normalized status)
+            // Only show Modify/Cancel if status is NOT CANCELLED and NOT REJECTED
+            const showActionButtons =
+              statusUpper !== "CANCELLED" && statusUpper !== "REJECTED";
+
+            tableHtml += `
+                        <tr>
+                    <td>${reservation.userSequenceNumber}</td>
+                    <td>${
+                      reservation.roomName || `Room ${reservation.roomId}`
+                    }</td>
+                    <td>${reservation.topic}</td>
+                    <td>${formatReservationTime(
+                      reservation.startTime,
+                      reservation.endTime
+                    )}</td>
+                            <td><span class="${statusClass}">${
+              // Display the original status text
+              reservation.status || "Confirmed"
+            }</span></td>
+                    <td>${formatDateTime(reservation.createdAt)}</td>
+                    <td>
+                        <button class="btn btn-outline-primary btn-sm" onclick="viewReservationDetails(${
+                          reservation.id
+                        })">Details</button>
+                        ${
+                          showActionButtons // Use the boolean flag here
+                            ? `
+                                <button class="btn btn-custom-modify btn-sm" onclick="modifyReservation(${reservation.id})">Modify</button>
+                                <button class="btn btn-custom-cancel-primary btn-sm" onclick="cancelReservation(${reservation.id})">Cancel</button>
+                        `
+                            : ""
+                        }
+                    </td>
+                        </tr>`;
+          });
+
+          tableHtml += `</tbody></table>`;
+        }
+
+        displayArea.innerHTML = tableHtml; // Render table into the display area
+      }
+
+      // 查看预订详情 (Renders details in two columns per row)
+      function viewReservationDetails(reservationId) {
+        fetch(`${apiUrl}/reservations/${reservationId}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((reservation) => {
+            const displayArea = document.getElementById("bookingDisplayArea");
+            if (!displayArea) return;
+
+            // Construct details HTML using Bootstrap grid for two columns per row
+            const detailsHtml = `
+                <div class="d-flex flex-column"> 
+                    <div>
+                        <h5 class="mb-3">Booking Details (ID: ${
+                          reservation.userSequenceNumber
+                        })</h5>
+                        <div class="booking-details-grid"> 
+                            <div class="row mb-2">
+                                <div class="col-md-2 fw-bold">User</div>
+                                <div class="col-md-4">
+                                     ${reservation.userName} (ID: ${reservation.userId})
+                                </div>
+                                <div class="col-md-2 fw-bold">Room:</div>
+                                <div class="col-md-4">${
+                                  reservation.roomName ||
+                                  `Room ${reservation.roomId}`
+                                }</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-2 fw-bold">Topic:</div>
+                                <div class="col-md-4">${reservation.topic}</div>
+                                <div class="col-md-2 fw-bold">Time:</div>
+                                <div class="col-md-4">${formatReservationTime(
+                                  reservation.startTime,
+                                  reservation.endTime
+                                )}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-2 fw-bold">Status:</div>
+                                <div class="col-md-4">${
+                                  reservation.status || "Confirmed"
+                                }</div>
+                                <div class="col-md-2 fw-bold">Created At:</div>
+                                <div class="col-md-4">${formatDateTime(
+                                  reservation.createdAt
+                                )}</div>
+                            </div>
+                            <!-- Updated At is intentionally removed -->
+                        </div>
+                    </div>
+                    <div class="mt-auto"> 
+                        <div class="mt-4">
+                            <button class="btn btn-outline-secondary me-2" onclick="getMyReservations()">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Bookings List
+                            </button>
+                        </div>
+                    </div>
+                </div>
+              `;
+
+            displayArea.innerHTML = detailsHtml; // Render details into the display area
+          })
+          .catch((error) => {
+            const displayArea = document.getElementById("bookingDisplayArea");
+            if (displayArea) {
+              displayArea.innerHTML = `<div class="alert alert-danger">Error fetching booking details: ${error.message}</div>`;
+            }
+            console.error("Error fetching booking details:", error);
+          });
+      }
+
+      // 修改预订 - Populates the hidden form (Same as portal.html)
+      function modifyReservation(reservationId) {
+        console.log(`Attempting to modify reservation ID: ${reservationId}`);
+        fetch(`${apiUrl}/reservations/${reservationId}`)
+          .then((res) => {
+            if (!res.ok)
+              throw new Error(`Could not fetch booking details: ${res.status}`);
+            return res.json();
+          })
+          .then(async (reservation) => {
+            // Populate form fields
+            document.getElementById("userId").value = reservation.userId;
+            document.getElementById("username").value =
+              reservation.userName || `User ${reservation.userId}`; // Use userName if available
+            document.getElementById("roomId").value = reservation.roomId;
+            document.getElementById("roomName").value =
+              reservation.roomName || `Room ${reservation.roomId}`;
+            document.getElementById("topic").value = reservation.topic;
+            const dateInput = document.getElementById("date");
+            dateInput.value = reservation.startTime.split("T")[0];
+
+            currentModifyingReservationId = reservation.id;
+            console.log(
+              `Set currentModifyingReservationId to: ${currentModifyingReservationId}`
+            );
+
+            // Update time slots considering the reservation being modified
+            await updateTimeSlots(); // Ensure this waits
+
+            // Pre-select the time slots for the reservation being modified
+            const startHour = new Date(reservation.startTime).getHours();
+            const endHour = new Date(reservation.endTime).getHours(); // End hour is exclusive
+            selectionStart = startHour;
+            selectionEnd = endHour - 1; // Last selected slot is endHour - 1
+
+            updateSelection(); // Visually select the slots
+            updateTimeInputs(); // Update the start/end time inputs
+
+            // Show the booking form card
+            showBookingForm();
+
+            // Scroll to the booking form
+            document
+              .getElementById("bookingFormCard")
+              .scrollIntoView({ behavior: "smooth" });
+          })
+          .catch((e) => {
+            console.error("Error loading reservation for modification:", e);
+            alert("Error loading booking for modification: " + e.message);
+          });
+      }
+
+      // 提交修改的预订 (Same as portal.html, but resets modification state)
+      function submitModifyReservation() {
+        console.log(
+          `Submitting modification for ID: ${currentModifyingReservationId}`
+        );
+        const reservationId = currentModifyingReservationId;
+        const userId = document.getElementById("userId").value;
+        const roomId = document.getElementById("roomId").value;
+        const topic = document.getElementById("topic").value;
+        const date = document.getElementById("date").value;
+        const startTime = document.getElementById("startTime").value;
+        const endTime = document.getElementById("endTime").value;
+
+        if (
+          !reservationId ||
+          !userId ||
+          !roomId ||
+          !topic ||
+          !date ||
+          !startTime ||
+          !endTime
+        ) {
+          displayMessage(
+            "reservationResult",
+            "Please fill in all required fields",
+            "danger"
+          );
+          return;
+        }
+        if (userId === "null" || !userId) {
+          displayMessage(
+            "reservationResult",
+            "Could not get user ID, please log in first",
+            "danger"
+          );
+          return;
+        }
+
+        const startDateTime = `${date}T${startTime}:00`;
+        const endDateTime = `${date}T${endTime}:00`;
+
+        const updatedReservation = {
+          id: reservationId,
+          userId: parseInt(userId),
+          roomId: parseInt(roomId),
+          topic: topic,
+          reason: topic,
+          startTime: startDateTime,
+          endTime: endDateTime,
+        };
+        console.log("Sending PUT request with data:", updatedReservation);
+
+        fetch(`${apiUrl}/reservations/${reservationId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedReservation),
+        })
+          .then(async (response) => {
+            console.log("PUT response status:", response.status);
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(
+                `Error updating reservation: ${response.status} - ${errorText}`
+              );
+              throw new Error(
+                errorText || `HTTP error! Status: ${response.status}`
+              );
+            }
+            return response.text(); // Or response.json() if backend returns updated object
+          })
+          .then((data) => {
+            // Display success message in the dedicated list message area
+            displayMessage(
+              "listMessagesArea", // Changed target to dedicated area
+              "Booking updated successfully!",
+              "success"
+            );
+            currentModifyingReservationId = null; // Reset modification state
+            resetBookingForm(); // Hide the form after success
+            getMyReservations(); // Refresh the list
+          })
+          .catch((error) => {
+            // Display error message also in the dedicated list message area
+            displayMessage(
+              "listMessagesArea", // Changed target to dedicated area
+              `Error updating booking: ${error.message}`,
+              "danger"
+            );
+            console.error("Update error:", error);
+          });
+      }
+
+      // 取消预订 (Same as portal.html, refreshes list)
+      function cancelReservation(reservationId) {
+        if (confirm("Are you sure you want to cancel this booking?")) {
+          fetch(`${apiUrl}/reservations/${reservationId}`, {
+            method: "DELETE",
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.text();
+            })
+            .then((data) => {
+              // Display success message in the dedicated list message area
+              displayMessage(
+                "listMessagesArea", // Changed target to dedicated area
+                "Booking cancelled successfully",
+                "success",
+                true // Keep persist true for cancel maybe?
+              );
+              getMyReservations(); // Refresh the list
+            })
+            .catch((error) => {
+              alert("Error cancelling booking: " + error.message);
+              console.error("Cancel error:", error);
+            });
+        }
+      }
+
+      // --- Time Slot Logic (Copied from meeting-rooms.html) ---
+      function initializeTimeSlots() {
+        const grid = document.getElementById("timeSlotGrid");
+        const labels = document.getElementById("timeLabels");
+        if (!grid || !labels) return; // Check if elements exist
+        grid.innerHTML = "";
+        labels.innerHTML = "";
+        for (let i = 8; i <= 22; i++) {
+          const slot = document.createElement("div");
+          slot.className = "time-slot";
+          slot.dataset.hour = i;
+          slot.addEventListener("click", handleTimeSlotClick);
+          grid.appendChild(slot);
+          const label = document.createElement("div");
+          label.textContent = `${String(i).padStart(2, "0")}:00`;
+          labels.appendChild(label);
+        }
+      }
+
+      let selectionStart = null;
+      let selectionEnd = null;
+
+      function handleTimeSlotClick(event) {
+        const clickedSlot = event.target;
+        const clickedHour = parseInt(clickedSlot.dataset.hour);
+
+        if (
+          clickedSlot.classList.contains("reserved") &&
+          !clickedSlot.classList.contains("owned")
+        ) {
+          return; // Block clicks on non-owned reserved slots
+        }
+
+        if (
+          selectionStart === null ||
+          (selectionStart !== null && selectionEnd !== null)
+        ) {
+          clearSelection();
+          selectionStart = clickedHour;
+          clickedSlot.classList.add("selected");
+        } else {
+          selectionEnd = clickedHour;
+          if (selectionEnd < selectionStart) {
+            [selectionStart, selectionEnd] = [selectionEnd, selectionStart];
+          }
+          if (selectionEnd - selectionStart >= 3) {
+            alert("Booking duration cannot exceed 3 hours");
+            selectionEnd = selectionStart + 2;
+          }
+          const slots = document.querySelectorAll(".time-slot");
+          let hasReservedSlot = false;
+          slots.forEach((slot) => {
+            const hour = parseInt(slot.dataset.hour);
+            if (hour >= selectionStart && hour <= selectionEnd) {
+              if (
+                slot.classList.contains("reserved") &&
+                !slot.classList.contains("owned")
+              ) {
+                hasReservedSlot = true;
+              }
+            }
+          });
+          if (hasReservedSlot) {
+            clearSelection();
+            alert(
+              "Cannot select a range that includes time slots already booked by others"
+            );
+            return;
+          }
+          updateSelection();
+        }
+        updateTimeInputs();
+      }
+
+      function clearSelection() {
+        const slots = document.querySelectorAll(".time-slot");
+        slots.forEach((slot) => {
+          if (
+            !slot.classList.contains("reserved") ||
+            slot.classList.contains("owned")
+          ) {
+            slot.classList.remove("selected");
+          }
+        });
+        selectionStart = null;
+        selectionEnd = null;
+        const startTimeInput = document.getElementById("startTime");
+        const endTimeInput = document.getElementById("endTime");
+        const timeRangeSpan = document.getElementById("selected-time-range");
+        if (startTimeInput) startTimeInput.value = "";
+        if (endTimeInput) endTimeInput.value = "";
+        if (timeRangeSpan) timeRangeSpan.textContent = "";
+      }
+
+      function updateSelection() {
+        const slots = document.querySelectorAll(".time-slot");
+        slots.forEach((slot) => {
+          const hour = parseInt(slot.dataset.hour);
+          const isOwned = slot.classList.contains("owned");
+          const isBlocked = slot.classList.contains("reserved") && !isOwned;
+          if (!isBlocked) {
+            slot.classList.remove("selected");
+            if (selectionStart !== null && selectionEnd !== null) {
+              if (hour >= selectionStart && hour <= selectionEnd) {
+                slot.classList.add("selected");
+              }
+            } else if (selectionStart !== null && hour === selectionStart) {
+              slot.classList.add("selected");
+            }
+          }
+        });
+      }
+
+      function updateTimeInputs() {
+        const startTimeInput = document.getElementById("startTime");
+        const endTimeInput = document.getElementById("endTime");
+        const timeRangeSpan = document.getElementById("selected-time-range");
+        if (!startTimeInput || !endTimeInput || !timeRangeSpan) return;
+
+        if (selectionStart !== null) {
+          const startStr = `${String(selectionStart).padStart(2, "0")}:00`;
+          startTimeInput.value = startStr;
+          if (selectionEnd !== null) {
+            const endStr = `${String(selectionEnd + 1).padStart(2, "0")}:00`;
+            endTimeInput.value = endStr;
+            timeRangeSpan.textContent = `${startStr} - ${endStr}`;
+          } else {
+            const endStr = `${String(selectionStart + 1).padStart(2, "0")}:00`;
+            endTimeInput.value = endStr;
+            timeRangeSpan.textContent = `${startStr} - ${endStr}`;
+          }
+        } else {
+          startTimeInput.value = "";
+          endTimeInput.value = "";
+          timeRangeSpan.textContent = "";
+        }
+      }
+
+      async function updateTimeSlots() {
+        const date = document.getElementById("date").value;
+        const roomId = document.getElementById("roomId").value;
+        const currentUserId = document.getElementById("userId").value;
+        const grid = document.getElementById("timeSlotGrid");
+        const slots = document.querySelectorAll(".time-slot");
+        if (!date || !roomId || !grid || slots.length === 0) return [];
+
+        clearSelection();
+        slots.forEach((slot) => {
+          slot.classList.remove("reserved", "selected", "owned");
+          slot.style.pointerEvents = "auto";
+          slot.style.cursor = "pointer";
+          slot.title = "Click to select this time slot";
+        });
+        grid.style.opacity = "0.5";
+
+        try {
+          const response = await fetch(
+            `${apiUrl}/reservations/room/${roomId}/availability?date=${date}`
+          );
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(
+              `Error fetching availability: ${response.status} - ${errorText}`
+            );
+            throw new Error(`HTTP error ${response.status}`);
+          }
+          const reservations = await response.json();
+          const activeReservations = reservations.filter(
+            (res) => res.status !== "CANCELED"
+          );
+
+          slots.forEach((slot) => {
+            const hour = parseInt(slot.dataset.hour);
+            let isReservedByOther = false;
+            let isOwnedByCurrentUser = false;
+            let reservationBeingModified = null;
+
+            if (currentModifyingReservationId) {
+              reservationBeingModified = activeReservations.find(
+                (r) => r.id === currentModifyingReservationId
+              );
+            }
+
+            for (const res of activeReservations) {
+              // Skip the reservation currently being modified when checking for conflicts
+              if (
+                reservationBeingModified &&
+                res.id === reservationBeingModified.id
+              ) {
+                continue;
+              }
+
+              const resStart = new Date(res.startTime).getHours();
+              const resEnd = new Date(res.endTime).getHours();
+              if (hour >= resStart && hour < resEnd) {
+                if (
+                  res.userId &&
+                  currentUserId &&
+                  res.userId.toString() === currentUserId.toString()
+                ) {
+                  isOwnedByCurrentUser = true; // Owned by current user, but not the one being modified
+                } else {
+                  isReservedByOther = true;
+                }
+              }
+              if (isReservedByOther) break;
+            }
+
+            // Now handle the reservation being modified specifically
+            if (reservationBeingModified) {
+              const modStart = new Date(
+                reservationBeingModified.startTime
+              ).getHours();
+              const modEnd = new Date(
+                reservationBeingModified.endTime
+              ).getHours();
+              if (hour >= modStart && hour < modEnd) {
+                slot.classList.add("owned");
+                isOwnedByCurrentUser = true; // Ensure this is set for styling/logic
+                slot.title = "Current modified booking time slot (Clickable)";
+              }
+            }
+
+            // Apply final classes
+            if (isOwnedByCurrentUser && !isReservedByOther) {
+              // Already handled by adding "owned" above for the modified one
+              // For other owned slots not being modified:
+              if (
+                !reservationBeingModified ||
+                hour <
+                  new Date(reservationBeingModified.startTime).getHours() ||
+                hour >= new Date(reservationBeingModified.endTime).getHours()
+              ) {
+                slot.classList.add("reserved"); // Visually reserved
+                slot.classList.add("owned"); // Allow interaction if needed, or adjust logic
+                slot.title = "You have booked this time slot";
+              }
+            } else if (isReservedByOther) {
+              slot.classList.add("reserved");
+              slot.title = "Booked by someone else";
+              slot.style.pointerEvents = "none";
+            }
+          });
+
+          grid.style.opacity = "1";
+          return activeReservations;
+        } catch (e) {
+          console.error("Error updating time slots:", e);
+          alert(`Could not load availability for ${date}: ${e.message}`);
+          grid.style.opacity = "1";
+          return [];
+        }
+      }
+
+      // --- Helper Functions ---
+      function formatDateTime(dateTimeStr) {
+        if (!dateTimeStr) return "N/A";
+        const date = new Date(dateTimeStr);
+
+        const pad = n => n.toString().padStart(2, '0');
+
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} `
+                + `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+      }
+
+      function formatReservationTime(startTime, endTime) {
+        if (!startTime || !endTime) return "N/A";
+        const startDateTime = new Date(startTime);
+        const endDateTime = new Date(endTime);
+        const date = startDateTime.toISOString().split("T")[0];
+        const startTimeStr = startDateTime.toTimeString().substring(0, 5);
+        const endTimeStr = endDateTime.toTimeString().substring(0, 5);
+        return `${date} ${startTimeStr}-${endTimeStr}`;
+      }
+
+      function displayMessage(
+        elementId,
+        message,
+        type = "info",
+        persist = false
+      ) {
+        const resultDiv = document.getElementById(elementId);
+        if (resultDiv) {
+          // Create the alert element dynamically
+          const alertElement = document.createElement("div");
+          alertElement.className = `alert alert-${type} alert-dismissible fade show`;
+          alertElement.setAttribute("role", "alert");
+          alertElement.innerHTML = `
+              ${message}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+
+          // Prepend the alert to the target div
+          resultDiv.insertBefore(alertElement, resultDiv.firstChild);
+
+          // Scroll the message into view
+          alertElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+          // Timeout to remove the specific alert if not persistent
+          if (!persist) {
+            setTimeout(() => {
+              // Use the created alertElement directly
+              const alertInstance =
+                bootstrap.Alert.getOrCreateInstance(alertElement);
+              if (alertInstance) {
+                alertInstance.close();
+              }
+            }, 5000);
+          }
+        }
+      }
+
+      function showBookingForm() {
+        const formContent = document.getElementById("bookingFormContent");
+        const placeholder = document.getElementById("bookingFormPlaceholder");
+        // No need to show the card itself anymore, just the content
+        if (formContent) formContent.style.display = "block";
+        if (placeholder) placeholder.style.display = "none";
+      }
+
+      function resetBookingForm() {
+        const formContent = document.getElementById("bookingFormContent");
+        const placeholder = document.getElementById("bookingFormPlaceholder");
+
+        // Clear specific fields (adjust as needed)
+        document.getElementById("roomId").value = "";
+        document.getElementById("roomName").value = "";
+        document.getElementById("topic").value = "Team Meeting"; // Reset topic
+        document.getElementById("date").value = ""; // Clear date
+        document.getElementById("startTime").value = "";
+        document.getElementById("endTime").value = "";
+        document.getElementById("selected-time-range").textContent = "";
+        document.getElementById("reservationResult").innerHTML = ""; // Clear result message
+        clearSelection(); // Clear time slot selection
+
+        currentModifyingReservationId = null; // Clear modification state
+
+        if (formContent) formContent.style.display = "none";
+        if (placeholder) placeholder.style.display = "block";
+      }
+    </script>
+    <!-- Add Shared Theme Script -->
+    <script th:src="@{/scripts/shared/theme.js}"></script>
+
+    <!-- Include Help Center Modal -->
+    <div th:replace="~{user/fragments/help-center :: help_center_modal}"></div>
+  </body>
+</html>

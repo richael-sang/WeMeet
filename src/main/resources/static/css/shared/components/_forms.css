@@ -1,0 +1,71 @@
+/* Form Styles from settings.html <style> */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--purple-primary);
+  box-shadow: 0 0 0 0.2rem rgba(149, 105, 212, 0.25);
+}
+.form-check-input:checked {
+  background-color: var(--purple-primary);
+  border-color: var(--purple-primary);
+}
+
+/* Added/Updated from meeting-rooms-management.html */
+.form-control {
+  border-radius: 6px; /* Updated */
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+}
+
+.form-control:focus {
+  /* Keep focus style from settings */
+  border-color: var(--purple-primary);
+  box-shadow: 0 0 0 0.2rem rgba(149, 105, 212, 0.25);
+}
+
+.form-group label, /* Assuming .form-group is used, adjust if needed */
+.form-label /* For consistency with Bootstrap */ {
+  font-weight: 500;
+  color: var(--secondary-text-color); /* Use secondary text color */
+}
+
+/* Added for checkboxes/radios */
+.form-check-label {
+  color: var(--text-color);
+}
+
+/* Add Dark Mode styles for form-select */
+.dark-mode .form-select {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--input-border);
+  /* Explicitly set the background image for the dropdown arrow for dark mode */
+  /* SVG data URI for a white arrow (adjust color/opacity as needed) */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23eaeaea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* Optionally style the :disabled state for dark mode */
+.dark-mode .form-select:disabled {
+  background-color: var(
+    --input-bg
+  ); /* Or a slightly different grey if needed */
+  opacity: 0.7;
+  color: var(--secondary-text-color);
+}
+
+/* Add Dark Mode styles for disabled/readonly inputs */
+.dark-mode .form-control:disabled,
+.dark-mode .form-control[readonly] {
+  background-color: var(
+    --input-bg
+  ); /* Use variable instead of hardcoded color */
+  border-color: var(--input-border);
+  color: var(--secondary-text-color); /* Muted text color */
+  opacity: 0.7; /* Standard opacity for disabled */
+}
+
+/* Ensure table body text is light in dark mode */
+.dark-mode .table > tbody > tr > td {
+  color: var(--text-color);
+}

@@ -1,0 +1,100 @@
+/* Shared Button Styles (Originally from admin/components/_buttons.css) */
+
+/* Primary Button */
+.btn-primary {
+  background-color: var(--button-primary-bg) !important;
+  border-color: var(--button-primary-bg) !important;
+  color: var(--button-primary-text) !important;
+}
+.btn-primary:hover {
+  background-color: var(--button-primary-hover-bg) !important;
+  border-color: var(--button-primary-hover-bg) !important;
+  color: var(--button-primary-text) !important;
+}
+
+/* Outline Primary Button */
+.btn-outline-primary {
+  color: var(--link-color) !important;
+  border-color: var(--link-color) !important;
+}
+.btn-outline-primary:hover {
+  background-color: var(--link-color) !important;
+  color: var(--button-primary-text) !important;
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background-color: var(--button-secondary-bg) !important;
+  border-color: var(--button-secondary-bg) !important;
+  color: var(--button-secondary-text) !important;
+}
+.btn-secondary:hover {
+  background-color: var(--button-secondary-hover-bg) !important;
+  border-color: var(--button-secondary-hover-bg) !important;
+  color: var(--button-secondary-text) !important;
+}
+
+/* Outline Secondary Button */
+.btn-outline-secondary {
+  color: var(--secondary-text-color) !important;
+  border-color: var(--secondary-text-color) !important;
+}
+.btn-outline-secondary:hover {
+  background-color: var(--button-secondary-bg) !important;
+  color: var(--button-secondary-text) !important;
+}
+
+/* Ensure other outline buttons adapt (assuming Bootstrap defaults are okay) */
+.btn-outline-success:hover {
+  color: white;
+}
+.btn-outline-danger:hover {
+  color: white;
+}
+
+/* Custom Light Purple Button */
+.btn-light-purple {
+  background-color: var(--purple-lighter);
+  border-color: var(--purple-lighter);
+  color: var(--purple-primary);
+}
+
+.btn-light-purple:hover {
+  background-color: var(--purple-light);
+  border-color: var(--purple-light);
+  color: white;
+}
+
+/* --- Dark Mode Overrides --- */
+
+/* Dark mode override for btn-light */
+.dark-mode .btn-light {
+  background-color: var(--button-secondary-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--button-secondary-text) !important;
+}
+
+.dark-mode .btn-light:hover {
+  background-color: var(--button-secondary-hover-bg) !important;
+  border-color: var(
+    --border-color
+  ) !important; /* Keep border color consistent */
+  color: var(--button-secondary-text) !important;
+}
+
+/* Dark mode override for btn-light-purple */
+.dark-mode .btn-light-purple {
+  background-color: var(
+    --button-secondary-bg
+  ) !important; /* Use secondary button gray */
+  border-color: var(--button-secondary-bg) !important;
+  color: var(--text-color) !important; /* Use light text color */
+}
+
+.dark-mode .btn-light-purple:hover {
+  background-color: var(
+    --button-secondary-hover-bg
+  ) !important; /* Use secondary hover gray */
+  border-color: var(--button-secondary-hover-bg) !important;
+  color: var(--text-color) !important;
+}

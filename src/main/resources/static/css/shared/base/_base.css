@@ -1,0 +1,39 @@
+body {
+  background-color: var(--bg-color); /* Use CSS variable */
+  color: var(--text-color); /* Use CSS variable for default text color */
+  overflow-y: scroll; /* Always show vertical scrollbar to prevent layout shift */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+/* Add other global styles here if needed, e.g., basic typography */
+
+/* Ensure links also use the variable */
+a {
+  color: var(--link-color);
+}
+a:hover {
+  color: var(--link-hover-color);
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-color);
+}
+
+/* Muted text */
+.text-muted {
+  color: var(
+    --secondary-text-color
+  ) !important; /* Override Bootstrap if necessary */
+}
+
+/* Icons */
+.icon-purple i,
+.icon-purple {
+  color: var(--icon-color);
+}

@@ -1,0 +1,56 @@
+/* Basic Modal Styles (can be expanded) */
+/* From meeting-rooms-management.html */
+.modal-content {
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: var(--modal-header-bg);
+  color: var(--modal-header-text);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+  font-weight: 600;
+  color: var(--modal-header-text);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  color: var(--text-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  padding: 1rem 1.5rem;
+}
+
+/* Adjust close button color */
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+.dark-mode .modal-header .btn-close {
+  filter: none;
+  background-color: var(--modal-close-button);
+}
+
+/* Specific Modal Types */
+.delete-modal .modal-header {
+  background: linear-gradient(to right, #dc3545, #e35d6a);
+}
+
+/* Animation for modals */
+.modal.fade .modal-dialog {
+  transform: scale(0.8);
+  transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+  transform: scale(1);
+}
+
+/* Add styles for .modal-content, .modal-body, .modal-footer as needed */

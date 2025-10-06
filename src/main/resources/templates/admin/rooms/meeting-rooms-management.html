@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meeting Rooms Management - WeMeet</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- Link to the new central admin CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}" />
+    <!-- Removed inline styles and old CSS links -->
+
+    <!-- Inline script to set initial theme before body renders -->
+    <script>
+      // Immediately set the theme class based on localStorage to prevent FOUC
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark-mode");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Use unified navigation bar -->
+    <div
+      th:replace="~{admin/fragments/nav :: admin_nav(active='rooms', showMainNav=true)}"
+    ></div>
+
+    <div class="container py-4">
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="page-title">
+              <i class="fas fa-door-open me-2"></i> Meeting Rooms Management
+            </h2>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#addRoomModal"
+            >
+              <i class="fas fa-plus me-1"></i> Add New Room
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="content-container mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-filter me-2 icon-purple"></i>Filter Rooms
+          </h5>
+          <button id="clearFilters" class="btn btn-sm btn-light">
+            <i class="fas fa-redo me-1"></i>Reset Filters
+          </button>
+        </div>
+
+        <!-- Display applied filters if this is a test filter request -->
+        <!-- REMOVED the applied filters box -->
+        <!-- <div class="alert alert-info mb-3" th:if="${testFilter}"> ... </div> -->
+
+        <!-- Use row with g-3 for spacing -->
+        <div class="row g-3">
+          <div class="col-md-3">
+            <div class="form-group mb-0">
+              <label for="roomSearch" class="form-label small text-muted"
+                >Room Name</label
+              >
+              <div class="input-group">
+                <span class="input-group-text bg-light">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="roomSearch"
+                  name="name"
+                  placeholder="Search by name..."
+                  th:value="${filterName}"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group mb-0">
+              <label for="locationFilter" class="form-label small text-muted"
+                >Location</label
+              >
+              <select
+                class="form-select form-control"
+                id="locationFilter"
+                name="location"
+              >
+                <option value="">All Locations</option>
+                <option
+                  th:each="location : ${locations}"
+                  th:value="${location}"
+                  th:text="${location}"
+                  th:selected="${location == filterLocation}"
+                >
+                  Building A
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group mb-0">
+              <label for="floorFilter" class="form-label small text-muted"
+                >Floor</label
+              >
+              <select
+                class="form-select form-control"
+                id="floorFilter"
+                name="floor"
+              >
+                <option value="">All Floors</option>
+                <option
+                  th:each="floor : ${floors}"
+                  th:value="${floor}"
+                  th:text="${floor}"
+                  th:selected="${floor?.toString() == filterFloor}"
+                >
+                  1
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button
+              type="button"
+              id="applyFilters"
+              class="btn btn-primary w-100"
+            >
+              <i class="fas fa-filter me-1"></i>Apply Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert Container -->
+      <div id="alertContainer"></div>
+
+      <!-- Room Cards Container -->
+      <div class="content-container">
+        <!-- Room Cards -->
+        <div class="row" id="roomsContainer">
+          <div
+            class="col-md-4 mb-4 room-card"
+            th:each="room : ${rooms}"
+            th:data-name="${room.roomName}"
+            th:data-capacity="${room.capacity}"
+            th:data-location="${room.location != null ? room.location : ''}"
+            th:data-floor="${room.floor != null ? room.floor : ''}"
+            th:data-has-projector="${room.hasProjector}"
+            th:data-has-screen="${room.hasScreen}"
+            th:data-has-speaker="${room.hasSpeaker}"
+            th:data-has-computer="${room.hasComputer}"
+            th:data-has-whiteboard="${room.hasWhiteboard}"
+            th:data-image-url="${room.imageUrl != null ? room.imageUrl : ''}"
+          >
+            <div class="card h-100">
+              <div
+                th:if="${room.imageUrl != null && !room.imageUrl.isEmpty()}"
+                class="card-img-top-container"
+              >
+                <img
+                  th:src="${room.imageUrl}"
+                  class="card-img-top"
+                  alt="Room image"
+                  style="height: 180px; object-fit: cover"
+                />
+              </div>
+              <div
+                class="card-header d-flex justify-content-between align-items-center"
+              >
+                <span th:text="${room.roomName}">Room Name</span>
+                <span
+                  class="badge bg-light text-dark"
+                  th:text="'Capacity: ' + ${room.capacity}"
+                  >Capacity: 10</span
+                >
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <span
+                    class="text-muted me-3"
+                    th:if="${room.location != null}"
+                  >
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    <span th:text="${room.location}">Building A</span>
+                  </span>
+                  <span class="text-muted" th:if="${room.floor != null}">
+                    <i class="fas fa-building me-1"></i> Floor
+                    <span th:text="${room.floor}">1</span>
+                  </span>
+                </div>
+                <p class="card-text" th:text="${room.description}">
+                  Room description goes here.
+                </p>
+                <h6 class="font-weight-bold mt-3 mb-2">Equipment:</h6>
+                <div>
+                  <span
+                    class="badge badge-equipment"
+                    th:if="${room.hasProjector}"
+                    ><i class="fas fa-video me-1"></i> Projector</span
+                  >
+                  <span class="badge badge-equipment" th:if="${room.hasScreen}"
+                    ><i class="fas fa-desktop me-1"></i> Screen</span
+                  >
+                  <span class="badge badge-equipment" th:if="${room.hasSpeaker}"
+                    ><i class="fas fa-volume-up me-1"></i> Speaker</span
+                  >
+                  <span
+                    class="badge badge-equipment"
+                    th:if="${room.hasComputer}"
+                    ><i class="fas fa-laptop me-1"></i> Computer</span
+                  >
+                  <span
+                    class="badge badge-equipment"
+                    th:if="${room.hasWhiteboard}"
+                    ><i class="fas fa-chalkboard me-1"></i> Whiteboard</span
+                  >
+                </div>
+              </div>
+              <div
+                class="card-footer bg-transparent d-flex justify-content-end"
+              >
+                <button
+                  class="btn btn-outline-info btn-sm me-2 update-image-btn"
+                  th:attr="data-id=${room.id},
+                                            data-room-name=${room.roomName},
+                                            data-image-url=${room.imageUrl != null ? room.imageUrl : ''}"
+                >
+                  <i class="fas fa-image me-1"></i> Update Image
+                </button>
+                <button
+                  class="btn btn-outline-primary btn-sm me-2 edit-room-btn"
+                  th:attr="data-id=${room.id},
+                                            data-room-name=${room.roomName},
+                                            data-capacity=${room.capacity},
+                                            data-location=${room.location != null ? room.location : ''},
+                                            data-floor=${room.floor != null ? room.floor : ''},
+                                            data-has-projector=${room.hasProjector},
+                                            data-has-screen=${room.hasScreen},
+                                            data-has-speaker=${room.hasSpeaker},
+                                            data-has-computer=${room.hasComputer},
+                                            data-has-whiteboard=${room.hasWhiteboard},
+                                            data-description=${room.description != null ? room.description : ''},
+                                            data-image-url=${room.imageUrl != null ? room.imageUrl : ''}"
+                >
+                  <i class="fas fa-edit me-1"></i> Edit
+                </button>
+                <button
+                  class="btn btn-outline-danger btn-sm delete-room-btn"
+                  th:attr="data-id=${room.id},
+                                            data-room-name=${room.roomName}"
+                >
+                  <i class="fas fa-trash-alt me-1"></i> Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Rooms Message (update to show when filter returns no results) -->
+        <div id="noRoomsMessage" class="text-center mt-4 d-none">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No meeting rooms match your
+            search criteria.
+          </div>
+        </div>
+
+        <!-- Empty state message when there are no rooms at all -->
+        <div class="text-center mt-4" th:if="${#lists.isEmpty(rooms)}">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No meeting rooms available.
+            Click "Add New Room" to create one.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Room Modal -->
+    <div
+      class="modal fade"
+      id="addRoomModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addRoomModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addRoomModalLabel">
+              <i class="fas fa-plus-circle me-2"></i>Add New Meeting Room
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form
+              id="addRoomForm"
+              th:action="@{/admin/rooms/add}"
+              method="post"
+            >
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="roomName">Room Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="roomName"
+                      name="roomName"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="capacity">Capacity</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="capacity"
+                      name="capacity"
+                      min="1"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="location">Location</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="location"
+                      name="location"
+                      placeholder="Building name or area"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="floor">Floor</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="floor"
+                      name="floor"
+                      min="1"
+                      placeholder="Floor number"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label for="imageUrl">Image URL</label>
+                    <input
+                      type="url"
+                      class="form-control"
+                      id="imageUrl"
+                      name="imageUrl"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                    <small class="form-text text-muted"
+                      >Enter a URL to an image of the meeting room</small
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Equipment</label>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="hasProjector"
+                        name="hasProjector"
+                      />
+                      <label class="form-check-label" for="hasProjector"
+                        ><i class="fas fa-video me-1"></i> Projector</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="hasScreen"
+                        name="hasScreen"
+                      />
+                      <label class="form-check-label" for="hasScreen"
+                        ><i class="fas fa-desktop me-1"></i> Screen</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="hasSpeaker"
+                        name="hasSpeaker"
+                      />
+                      <label class="form-check-label" for="hasSpeaker"
+                        ><i class="fas fa-volume-up me-1"></i> Speaker</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="hasComputer"
+                        name="hasComputer"
+                      />
+                      <label class="form-check-label" for="hasComputer"
+                        ><i class="fas fa-laptop me-1"></i> Computer</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="hasWhiteboard"
+                        name="hasWhiteboard"
+                      />
+                      <label class="form-check-label" for="hasWhiteboard"
+                        ><i class="fas fa-chalkboard me-1"></i>
+                        Whiteboard</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea
+                  class="form-control"
+                  id="description"
+                  name="description"
+                  rows="3"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="saveRoomBtn">
+              Save Room
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Room Modal -->
+    <div
+      class="modal fade"
+      id="editRoomModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="editRoomModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editRoomModalLabel">
+              <i class="fas fa-edit me-2"></i>Edit Meeting Room
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form
+              id="editRoomForm"
+              th:action="@{/admin/rooms/update}"
+              method="post"
+            >
+              <input type="hidden" id="editRoomId" name="id" />
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="editRoomName">Room Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editRoomName"
+                      name="roomName"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="editCapacity">Capacity</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="editCapacity"
+                      name="capacity"
+                      min="1"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="editLocation">Location</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="editLocation"
+                      name="location"
+                      placeholder="Building name or area"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="editFloor">Floor</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="editFloor"
+                      name="floor"
+                      min="1"
+                      placeholder="Floor number"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label for="editImageUrl">Image URL</label>
+                    <div class="input-group">
+                      <input
+                        type="url"
+                        class="form-control"
+                        id="editImageUrl"
+                        name="imageUrl"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        id="updateImageUrlBtn"
+                      >
+                        Update Image
+                      </button>
+                    </div>
+                    <small class="form-text text-muted"
+                      >Enter a URL to an image of the meeting room</small
+                    >
+                    <div id="imagePreview" class="mt-2 d-none">
+                      <img
+                        src=""
+                        class="img-thumbnail"
+                        style="max-height: 200px"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Equipment</label>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="editHasProjector"
+                        name="hasProjector"
+                      />
+                      <label class="form-check-label" for="editHasProjector"
+                        ><i class="fas fa-video me-1"></i> Projector</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="editHasScreen"
+                        name="hasScreen"
+                      />
+                      <label class="form-check-label" for="editHasScreen"
+                        ><i class="fas fa-desktop me-1"></i> Screen</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="editHasSpeaker"
+                        name="hasSpeaker"
+                      />
+                      <label class="form-check-label" for="editHasSpeaker"
+                        ><i class="fas fa-volume-up me-1"></i> Speaker</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="editHasComputer"
+                        name="hasComputer"
+                      />
+                      <label class="form-check-label" for="editHasComputer"
+                        ><i class="fas fa-laptop me-1"></i> Computer</label
+                      >
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="editHasWhiteboard"
+                        name="hasWhiteboard"
+                      />
+                      <label class="form-check-label" for="editHasWhiteboard"
+                        ><i class="fas fa-chalkboard me-1"></i>
+                        Whiteboard</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="editDescription">Description</label>
+                <textarea
+                  class="form-control"
+                  id="editDescription"
+                  name="description"
+                  rows="3"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="updateRoomBtn">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Room Modal -->
+    <div
+      class="modal fade delete-modal"
+      id="deleteRoomModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="deleteRoomModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteRoomModalLabel">
+              <i class="fas fa-exclamation-triangle me-2"></i>Delete Meeting
+              Room
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Are you sure you want to delete room "<span
+                id="deleteRoomName"
+                class="font-weight-bold"
+              ></span
+              >"?
+            </p>
+            <p class="text-danger">
+              <i class="fas fa-exclamation-circle me-1"></i> This action cannot
+              be undone.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <form
+              id="deleteRoomForm"
+              th:action="@{/admin/rooms/delete}"
+              method="post"
+            >
+              <input type="hidden" id="deleteRoomId" name="id" />
+              <button
+                type="submit"
+                class="btn btn-danger"
+                id="confirmDeleteBtn"
+              >
+                <i class="fas fa-trash-alt me-1"></i> Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Update Modal -->
+    <div
+      class="modal fade"
+      id="updateImageModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="updateImageModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateImageModalLabel">
+              <i class="fas fa-image me-2"></i>Update Room Image
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form
+              id="updateImageForm"
+              th:action="@{/admin/rooms/update-image}"
+              method="post"
+            >
+              <input type="hidden" id="updateImageRoomId" name="id" />
+              <div class="form-group">
+                <label for="updateImageUrl">Image URL</label>
+                <input
+                  type="url"
+                  class="form-control"
+                  id="updateImageUrl"
+                  name="imageUrl"
+                  placeholder="https://example.com/image.jpg"
+                  required
+                />
+                <small class="form-text text-muted"
+                  >Enter a URL to an image of the meeting room</small
+                >
+              </div>
+              <div id="imageUrlPreview" class="mt-3 text-center d-none">
+                <img src="" class="img-thumbnail" style="max-height: 200px" />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="saveImageBtn">
+              Save Image
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      type="module"
+      src="/scripts/admin/pages/rooms-management.js"
+    ></script>
+    <!-- Add Shared Theme Script -->
+    <script th:src="@{/scripts/shared/theme.js}"></script>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+/* Styles extracted from admin_nav.css */
+
+/* 基础导航栏样式 */
+.navbar {
+  background-color: var(--purple-primary) !important; /* Use variable */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .navbar-brand {
+  color: white !important;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-width: 120px;
+}
+
+.navbar .nav-link {
+  color: white !important; /* Base color, will be overridden */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Non-active links */
+.navbar.navbar-dark .navbar-nav > .nav-item > .nav-link {
+  color: rgba(255, 255, 255, 0.75) !important;
+  background-color: transparent !important;
+  border-radius: 4px;
+  font-weight: normal;
+  margin-right: 0.25rem;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* Hover on non-active links */
+.navbar.navbar-dark .navbar-nav > .nav-item:not(.active) > .nav-link:hover {
+  color: rgba(255, 255, 255, 1) !important;
+  background-color: rgba(
+    70,
+    27,
+    113,
+    0.5
+  ) !important; /* --purple-dark, semi-transparent */
+}
+
+/* Active links */
+.navbar.navbar-dark .navbar-nav > .nav-item.active > .nav-link {
+  color: white !important;
+  font-weight: 600 !important;
+  background-color: var(--purple-dark) !important; /* Use variable */
+  border-radius: 4px !important;
+}
+
+/* --- Remove duplicate rules from original admin_nav.css if they existed --- */
+
+/* Nav Pills Specific Styles (from settings.html <style>) */
+/* These might be better in a _pills.css or kept here if closely tied to nav */
+.nav-pills .nav-link {
+  color: var(--purple-primary);
+  background-color: var(--purple-lighter);
+  margin-right: 0.5rem;
+  border-radius: 0;
+}
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: var(--purple-primary);
+  border-color: var(--purple-primary);
+  color: white;
+}
+.nav-pills .nav-link:hover:not(.active) {
+  background-color: rgba(149, 105, 212, 0.3);
+}

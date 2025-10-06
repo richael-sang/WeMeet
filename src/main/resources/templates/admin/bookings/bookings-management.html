@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookings Management - WeMeet</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}" />
+
+    <!-- Inline script to set initial theme before body renders -->
+    <script>
+      // Immediately set the theme class based on localStorage to prevent FOUC
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark-mode");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div
+      th:replace="~{admin/fragments/nav :: admin_nav(active='bookings', showMainNav=true)}"
+    ></div>
+
+    <div class="container py-4">
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="page-title">
+              <i class="fas fa-calendar-alt me-2"></i> Bookings Management
+            </h2>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a th:href="@{/admin/reject-logs}" class="btn btn-primary">
+              <i class="fas fa-history me-1"></i>View Bookings Rejection Logs
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-container mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-filter me-2 icon-purple"></i>Filter Bookings
+          </h5>
+          <a th:href="@{/admin/bookings}" class="btn btn-sm btn-light">
+            <i class="fas fa-redo me-1"></i>Reset Filters
+          </a>
+        </div>
+        <form th:action="@{/admin/bookings}" method="get" class="row g-3">
+          <div class="col-md-2">
+            <label for="roomId" class="form-label small text-muted"
+              >Meeting Room</label
+            >
+            <select class="form-select form-control" id="roomId" name="roomId">
+              <option value="">All Rooms</option>
+              <option
+                th:each="room : ${rooms}"
+                th:value="${room.id}"
+                th:text="${room.roomName + ' - ' + (room.location != null ? room.location : '')}"
+                th:selected="${room.id == selectedRoomId}"
+              ></option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="status" class="form-label small text-muted"
+              >Status</label
+            >
+            <select class="form-select form-control" id="status" name="status">
+              <option value="">All Statuses</option>
+              <option
+                th:each="statusOption : ${statuses}"
+                th:if="${statusOption.name() != 'PENDING'}"
+                th:value="${statusOption}"
+                th:text="${statusOption}"
+                th:selected="${statusOption.name() == selectedStatus}"
+              ></option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="startDate" class="form-label small text-muted"
+              >Start Date</label
+            >
+            <input
+              type="date"
+              class="form-control"
+              id="startDate"
+              name="startDate"
+              th:value="${startDate}"
+              lang="en"
+            />
+          </div>
+          <div class="col-md-3">
+            <label for="endDate" class="form-label small text-muted"
+              >End Date</label
+            >
+            <input
+              type="date"
+              class="form-control"
+              id="endDate"
+              name="endDate"
+              th:value="${endDate}"
+              lang="en"
+            />
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-filter me-1"></i>Apply Filters
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="content-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">
+            <i class="fas fa-list me-2 icon-purple"></i>Bookings List
+          </h5>
+          <span
+            class="badge bg-purple"
+            th:text="${bookings.size() + ' Records'}"
+            >0 Records</span
+          >
+        </div>
+        <div class="table-responsive table-responsive-rounded">
+          <table class="table table-striped-purple table-hover mb-0">
+            <thead class="thead-purple">
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Room</th>
+                <th scope="col">User</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">End Time</th>
+                <th scope="col">Status</th>
+                <th scope="col">Created</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${bookings.size()== 0}">
+                <td colspan="8" class="text-center py-4">No bookings found</td>
+              </tr>
+              <tr
+                th:each="booking, stat : ${bookings}"
+                th:unless="${booking.status.name() == 'PENDING'}"
+              >
+                <td th:text="${stat.count}">1</td>
+                <td>
+                  <span th:text="${booking.roomName}">Room-101</span>
+                  <small
+                    class="d-block text-muted"
+                    th:text="${booking.roomLocation}"
+                    >Location</small
+                  >
+                </td>
+                <td>
+                  <span th:text="${booking.username}">Username</span>
+                  <small
+                    class="d-block text-muted"
+                    th:text="${booking.userEmail}"
+                    >Email</small
+                  >
+                </td>
+                <td
+                  th:text="${booking.formattedStartTime != null ? booking.formattedStartTime : 'N/A'}"
+                >
+                  2023-01-01 09:00
+                </td>
+                <td
+                  th:text="${booking.formattedEndTime != null ? booking.formattedEndTime : 'N/A'}"
+                >
+                  2023-01-01 10:00
+                </td>
+                <td>
+                  <span
+                    th:class="${'badge ' + 
+                                        (booking.status.name() == 'APPROVED' ? 'bg-success' : 
+                                        (booking.status.name() == 'REJECTED' ? 'bg-danger' : 'bg-secondary'))}"
+                    th:text="${booking.status}"
+                    >Status</span
+                  >
+                </td>
+                <td
+                  th:text="${booking.formattedCreatedAt != null ? booking.formattedCreatedAt : 'N/A'}"
+                >
+                  2023-01-01
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary view-booking-btn"
+                      title="View"
+                      data-bs-toggle="modal"
+                      data-bs-target="#viewBookingModal"
+                      th:data-room-name="${booking.roomName}"
+                      th:data-room-location="${booking.roomLocation}"
+                      th:data-username="${booking.username}"
+                      th:data-user-email="${booking.userEmail}"
+                      th:data-start-time="${booking.formattedStartTime}"
+                      th:data-end-time="${booking.formattedEndTime}"
+                      th:data-status="${booking.status}"
+                      th:data-reason="${booking.reason != null ? booking.reason : 'N/A'}"
+                      th:data-created-at="${booking.formattedCreatedAt}"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button
+                      type="button"
+                      th:if="${booking.status.name() == 'APPROVED'}"
+                      class="btn btn-outline-danger reject-btn"
+                      th:data-id="${booking.id}"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="viewBookingModal"
+      tabindex="-1"
+      aria-labelledby="viewBookingModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header thead-purple">
+            <h5 class="modal-title" id="viewBookingModalLabel">
+              <i class="fas fa-info-circle me-2"></i>Booking Details
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <dl>
+              <dt>Room:</dt>
+              <dd>
+                <span id="modalRoomName"></span> (<span
+                  id="modalRoomLocation"
+                ></span
+                >)
+              </dd>
+
+              <dt>User:</dt>
+              <dd>
+                <span id="modalUsername"></span> (<span
+                  id="modalUserEmail"
+                ></span
+                >)
+              </dd>
+
+              <dt>Time:</dt>
+              <dd>
+                <span id="modalStartTime"></span> -
+                <span id="modalEndTime"></span>
+              </dd>
+
+              <dt>Status:</dt>
+              <dd><span id="modalStatusBadge"></span></dd>
+
+              <dt>Reason:</dt>
+              <dd id="modalReason"></dd>
+
+              <dt>Created At:</dt>
+              <dd id="modalCreatedAt"></dd>
+            </dl>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/scripts/admin/pages/bookings-management.js}"></script>
+    <script th:src="@{/scripts/shared/theme.js}"></script>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+/* Badge Styles from meeting-rooms-management.html */
+.badge-equipment {
+  background-color: var(--purple-lighter);
+  color: var(--purple-primary);
+  font-weight: 500;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 6px 10px;
+  border-radius: 20px;
+}
+
+/* Dark mode override for equipment badge */
+.dark-mode .badge-equipment {
+  background-color: rgba(
+    149,
+    105,
+    212,
+    0.3
+  ); /* Use purple lighter RGB with more opacity */
+  color: var(--text-color); /* Use light text color */
+}
+
+/* Styles from users-management.html */
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 1rem; /* Consistent rounded badge */
+  font-size: 0.85em;
+}
+.status-active {
+  background-color: #d1e7dd; /* Light green */
+  color: #0f5132; /* Dark green */
+}
+.status-locked {
+  background-color: #f8d7da; /* Light red */
+  color: #842029; /* Dark red */
+}
+
+/* Styles from user-actions-log.html */
+.action-badge {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.25rem; /* Different radius for action badges? */
+  font-size: 0.85em;
+}
+.action-lock {
+  /* Match status-locked colors */
+  background-color: #f8d7da;
+  color: #842029;
+}
+.action-unlock {
+  /* Match status-active colors */
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+.action-export {
+  /* Keep original light blue */
+  background-color: rgba(13, 110, 253, 0.1);
+  color: #0a58ca;
+}
+.action-other {
+  /* Keep original light gray */
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #41464b;
+}
+
+/* Dark mode override for Bootstrap .bg-light badges */
+.dark-mode .badge.bg-light {
+  background-color: var(
+    --border-color
+  ) !important; /* Use border color for background */
+  color: var(--text-color) !important; /* Use standard dark mode text color */
+}

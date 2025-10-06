@@ -1,0 +1,32 @@
+/* Utility Styles from meeting-rooms-management.html */
+#roomsContainer.loading, /* Specific ID might be better as a class */
+.loading-state /* Example generic loading class */ {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Helper for icons if needed */
+.icon-purple {
+  color: var(--purple-primary);
+}
+
+.content-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Styles from users-management.html */
+.bg-purple {
+  background-color: var(--purple-primary) !important;
+  color: white;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 8px;
+}

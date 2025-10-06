@@ -1,0 +1,51 @@
+/* Page Layout Styles from settings.html <style> */
+.page-header {
+  background-color: var(--container-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+.page-title {
+  color: var(--purple-primary);
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.page-title i {
+  margin-right: 0.5rem;
+  background-color: var(--purple-lighter);
+  padding: 0.5rem;
+  border-radius: 50%;
+  color: var(--purple-primary);
+}
+
+/* Dark mode override for page title TEXT only */
+.dark-mode .page-title {
+  color: var(--text-color);
+}
+
+/* Add other layout rules like .container overrides if needed */
+
+/* Styles from users-management.html & user-actions-log.html */
+.table-responsive-rounded {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.list-header .btn {
+  margin-left: 0.5rem; /* Add margin to buttons in list headers */
+}
+
+/* Style for the main content areas */
+.content-container {
+  background-color: var(--container-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem; /* Consistent spacing */
+}

@@ -1,0 +1,301 @@
+/* Styles specific to meeting-rooms.html */
+
+.time-slot.owned {
+  background-color: #a493d6 !important; /* User specified default */
+  border: 1px dashed rgb(86, 43, 129); /* User specified selected */
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  color: #333;
+}
+
+/* Apply this style only to the container directly inside main */
+/* This might be better in a layout CSS if used elsewhere */
+main > .container {
+  max-width: 1200px;
+  margin: 20px auto;
+  background-color: var(--container-bg); /* Use variable */
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.time-slot-container {
+  margin: 20px 0;
+  padding: 10px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+/* Add dark mode style for time-slot-container */
+html.dark-mode .time-slot-container {
+  background-color: var(--card-bg);
+}
+
+.time-slot-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.time-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 2px;
+  background: #e9ecef;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.time-slot {
+  height: 40px;
+  background-color: #a493d6; /* User specified default */
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  position: relative;
+  pointer-events: auto;
+  opacity: 1 !important;
+}
+
+.time-slot:not(.reserved):hover {
+  background-color: #b8a9e0 !important; /* Derived hover for default */
+}
+
+.time-slot.reserved {
+  background-color: #9e9e9e !important;
+  cursor: not-allowed !important;
+  color: #ffffff !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+}
+
+.time-slot.reserved:hover {
+  background-color: #9e9e9e !important;
+}
+
+.time-slot.selected {
+  background-color: rgb(86, 43, 129) !important; /* User specified selected */
+  color: white !important;
+}
+
+.time-slot.selected:not(.reserved):hover {
+  background-color: rgb(
+    70,
+    27,
+    113
+  ) !important; /* Derived hover for selected */
+}
+
+.time-labels {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 2px;
+  margin-top: 5px;
+  font-size: 10px;
+  text-align: center;
+}
+
+.room-details-container {
+  display: flex;
+  gap: 20px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.room-info {
+  flex: 1;
+}
+
+.room-image-container {
+  width: 400px;
+  flex-shrink: 0;
+}
+
+.room-image-container img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-msg {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+
+.status-msg.error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-msg.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Styles for the dynamically generated room details view */
+.room-details-view .card-body {
+  padding: 1.5rem;
+}
+.room-details-list dt {
+  font-weight: 600;
+  color: var(--secondary-text-color);
+  margin-bottom: 0.5rem;
+}
+.room-details-list dd {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+.room-details-list dt.col-sm-12 {
+  font-weight: bold;
+  color: var(--text-color);
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+.room-details-list .badge-equipment {
+  background-color: var(--purple-lighter);
+  color: var(--purple-dark);
+  padding: 0.4em 0.6em;
+  font-size: 0.85em;
+}
+.dark-mode .room-details-list .badge-equipment {
+  background-color: rgba(167, 139, 250, 0.2);
+  color: #c4b5fd;
+}
+.room-details-image {
+  max-height: 400px;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+.room-details-view .card-body .mt-4 {
+  margin-top: 1.5rem !important;
+}
+
+/* Dark Mode Styles for Create/Modify Booking Card using CSS Variables */
+html.dark-mode #createBookingCard .card-header {
+  background-color: var(
+    --card-bg
+  ) !important; /* Use card background for header too, or a slightly darker variant if defined */
+  color: var(--text-color) !important;
+  border-bottom: 1px solid var(--border-color);
+}
+
+html.dark-mode #createBookingCard .card-body {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+html.dark-mode #createBookingCard .form-control,
+html.dark-mode #createBookingCard .form-select {
+  background-color: var(--input-bg) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+html.dark-mode #createBookingCard .form-control:focus,
+html.dark-mode #createBookingCard .form-select:focus {
+  border-color: var(
+    --link-color
+  ) !important; /* Use link color for focus border */
+  box-shadow: 0 0 0 0.2rem rgba(var(--link-color-rgb, 167, 139, 250), 0.25); /* Use link color with alpha */
+  /* Assuming --link-color-rgb is defined or fallback to RGB value */
+}
+
+html.dark-mode #createBookingCard .form-control::placeholder {
+  color: var(
+    --secondary-text-color
+  ); /* Use secondary text color for placeholder */
+}
+
+html.dark-mode #createBookingCard .form-control[readonly] {
+  background-color: var(
+    --border-color
+  ) !important; /* Use border color for readonly bg */
+  color: var(
+    --secondary-text-color
+  ) !important; /* Use secondary text for readonly text */
+  border-color: var(--border-color) !important; /* Match background */
+  cursor: not-allowed;
+}
+
+/* Dark Mode Styles for Time Slots using CSS Variables */
+html.dark-mode .time-slot-grid {
+  background: var(--border-color);
+}
+
+html.dark-mode .time-labels {
+  color: var(--secondary-text-color);
+}
+
+/* Default available slot in dark mode */
+html.dark-mode .time-slot {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+}
+
+/* Hover effect for available slot in dark mode */
+html.dark-mode .time-slot:not(.reserved):hover {
+  background-color: var(
+    --border-color
+  ) !important; /* Use border color for subtle hover */
+}
+
+/* Reserved slot in dark mode */
+html.dark-mode .time-slot.reserved {
+  background-color: var(
+    --border-color
+  ) !important; /* Use border color for reserved bg */
+  color: var(--secondary-text-color) !important;
+  cursor: not-allowed !important;
+  /* pointer-events: none is handled by default reserved class if needed */
+}
+
+/* Owned slot in dark mode */
+html.dark-mode .time-slot.owned {
+  background-color: rgba(
+    167,
+    139,
+    250,
+    0.2
+  ) !important; /* Use link color with alpha */
+  border: 1px dashed var(--link-color);
+  color: var(--text-color) !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure reserved but owned keeps owned styles in dark mode */
+html.dark-mode .time-slot.reserved.owned {
+  background-color: rgba(167, 139, 250, 0.2) !important;
+  color: var(--text-color) !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Explicitly disable hover for non-owned reserved slots in dark mode */
+html.dark-mode .time-slot.reserved:not(.owned):hover {
+  background-color: var(--border-color) !important;
+}
+
+/* Selected slot in dark mode */
+html.dark-mode .time-slot.selected {
+  background-color: var(
+    --link-color
+  ) !important; /* Use link color for selected */
+  color: #ffffff !important;
+}
+
+/* Hover effect for selected slots (available or owned) in dark mode */
+html.dark-mode .time-slot.selected:not(.reserved):hover,
+html.dark-mode .time-slot.selected.owned:hover {
+  background-color: var(--link-hover-color) !important;
+}

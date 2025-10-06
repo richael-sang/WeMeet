@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meeting Rooms - WeMeet</title>
+    <!-- Updated Title -->
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- Flatpickr CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <!-- Link to the main user CSS -->
+    <link rel="stylesheet" th:href="@{/css/user/user.css}" />
+
+    <script>
+      // Immediately set the theme class based on localStorage to prevent FOUC
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark-mode");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Include User Navigation Bar - Set 'rooms' as active -->
+    <div th:replace="~{user/fragments/nav :: user_nav('rooms', true)}"></div>
+
+    <div class="container py-4">
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-12">
+            <h1 class="page-title mb-0">
+              <i class="fas fa-door-open me-2"></i>
+              Find & Book Meeting Rooms
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Section (Unified) -->
+      <div class="row">
+        <div class="col-md-12">
+          <!-- Unified search section -->
+          <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="fas fa-search me-2"></i>Search</h5>
+            </div>
+            <div class="card-body">
+              <!-- Row 1: Keyword & Capacity -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="keyword" class="form-label">Keyword:</label>
+                    <input
+                      type="text"
+                      id="keyword"
+                      class="form-control"
+                      placeholder="Room name or location"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="minCapacity" class="form-label"
+                      >Capacity:</label
+                    >
+                    <input
+                      type="number"
+                      id="minCapacity"
+                      class="form-control"
+                      placeholder="Number of participants"
+                      min="1"
+                      oninput="validateCapacity(this)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Row 2: Building & Floor -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="building" class="form-label">Building:</label>
+                    <select
+                      id="building"
+                      class="form-select"
+                      onchange="updateFloorOptions()"
+                    >
+                      <option value="">All Buildings</option>
+                      <option value="Building A">Building A</option>
+                      <option value="Building B">Building B</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="floor" class="form-label">Floor:</label>
+                    <select id="floor" class="form-select">
+                      <option value="">All Floors</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Row 3: Checkboxes (Horizontal) -->
+              <div class="row mb-3">
+                <div class="col-12">
+                  <label class="form-label">Equipment & Options:</label>
+                  <!-- Optional: Add a label for the checkbox group -->
+                  <div class="d-flex flex-wrap">
+                    <!-- Use flexbox for horizontal layout with wrapping -->
+                    <div class="form-check me-3 mb-2">
+                      <input
+                        type="checkbox"
+                        id="hasProjector"
+                        class="form-check-input"
+                      />
+                      <label for="hasProjector" class="form-check-label"
+                        >Projector</label
+                      >
+                    </div>
+                    <div class="form-check me-3 mb-2">
+                      <input
+                        type="checkbox"
+                        id="hasWhiteboard"
+                        class="form-check-input"
+                      />
+                      <label for="hasWhiteboard" class="form-check-label"
+                        >Whiteboard</label
+                      >
+                    </div>
+                    <div class="form-check me-3 mb-2">
+                      <input
+                        type="checkbox"
+                        id="hasComputer"
+                        class="form-check-input"
+                      />
+                      <label for="hasComputer" class="form-check-label"
+                        >Computer</label
+                      >
+                    </div>
+                    <div class="form-check me-3 mb-2">
+                      <input
+                        type="checkbox"
+                        id="hasScreen"
+                        class="form-check-input"
+                      />
+                      <label for="hasScreen" class="form-check-label"
+                        >Screen</label
+                      >
+                    </div>
+                    <div class="form-check me-3 mb-2">
+                      <input
+                        type="checkbox"
+                        id="hasSpeaker"
+                        class="form-check-input"
+                      />
+                      <label for="hasSpeaker" class="form-check-label"
+                        >Speaker</label
+                      >
+                    </div>
+                    <div class="form-check mb-2">
+                      <!-- Last item doesn't need me-3 -->
+                      <input
+                        type="checkbox"
+                        id="isAvailable"
+                        class="form-check-input"
+                      />
+                      <label for="isAvailable" class="form-check-label"
+                        >Available Only</label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Button Row -->
+              <div class="mt-3 text-end">
+                <!-- Align button to the right -->
+                <button class="btn btn-primary" onclick="advancedSearch()">
+                  <i class="fas fa-search me-1"></i>Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Results Section -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white" id="searchResultsHeader">
+          <h5 class="mb-0"><i class="fas fa-list me-2"></i>Search Results</h5>
+        </div>
+        <div class="card-body">
+          <div id="searchResults">
+            <p>Please use the search function above to find meeting rooms.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create Reservation Section -->
+      <div class="card mb-4" id="createBookingCard">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-calendar-plus me-2"></i>Create Booking
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="username" class="form-label">User:</label>
+                <input
+                  type="text"
+                  id="username"
+                  class="form-control"
+                  th:value="${user?.username ?: ''}"
+                  readonly
+                />
+                <input type="hidden" id="userId" th:value="${user?.id ?: ''}" />
+              </div>
+              <div class="form-group mb-3">
+                <label for="roomName" class="form-label">Room:</label>
+                <input
+                  type="text"
+                  id="roomName"
+                  class="form-control"
+                  placeholder="Select a room from the search results"
+                  readonly
+                />
+                <input type="hidden" id="roomId" />
+              </div>
+              <div class="form-group mb-3">
+                <label for="topic" class="form-label">Topic:</label>
+                <input
+                  type="text"
+                  id="topic"
+                  class="form-control"
+                  value="Team Meeting"
+                  required
+                />
+                <small class="orm-text text-muted fs-7 d-block">
+                  “Team Meeting” is the default input, you can change it according to your own purpose
+                </small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="date" class="form-label">Date:</label>
+                <input
+                  type="date"
+                  id="date"
+                  class="form-control"
+                  required
+                  onchange="updateTimeSlots()"
+                />
+                <small class="orm-text text-muted fs-7 d-block">
+                  you can select your desired date
+                </small>
+              </div>
+              <div class="time-slot-container">
+                <div class="time-slot-header">
+                  <h5 class="mb-0">Select Time Slot</h5>
+                  <span id="selected-time-range"></span>
+                </div>
+                <div class="time-slot-grid" id="timeSlotGrid"></div>
+                <div class="time-labels" id="timeLabels"></div>
+              </div>
+              <div class="form-group mb-3">
+                <label for="startTime" class="form-label">Start Time:</label>
+                <input
+                  type="text"
+                  id="startTime"
+                  class="form-control"
+                  value="--:--"
+                  readonly
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="endTime" class="form-label">End Time:</label>
+                <input
+                  type="text"
+                  id="endTime"
+                  class="form-control"
+                  value="--:--"
+                  readonly
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Renamed button ID and changed text for clarity -->
+          <button
+            class="btn btn-primary"
+            id="submitReservationBtn"
+            onclick="handleReservationSubmit()"
+          >
+            Submit Booking
+          </button>
+          <div id="reservationResult" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Your custom scripts (Copied from portal.html, ensure all needed functions are present) -->
+    <script th:inline="javascript">
+      // API URL - Get from Thymeleaf config or use default
+      const apiUrl = /*[[@{/api}]]*/ "/api";
+      // Variable to track if we are modifying an existing reservation
+      let currentModifyingReservationId = null;
+
+      // Initialize on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("[DOMContentLoaded] Initializing meeting-rooms.html...");
+        const today = new Date();
+        const dateInput = document.getElementById("date");
+
+        // Set minimum date to today
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        dateInput.min = `${yyyy}-${mm}-${dd}`;
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+
+        initializeTimeSlots();
+        // Don't call updateTimeSlots() initially here, wait for room selection
+
+        // Set initial user - Use safe navigation ?. and default values
+        const userId = /*[[${user?.id}]]*/ null; // Default to null if user is not present
+        const username = /*[[${user?.username}]]*/ "Anonymous User"; // Default to 'Anonymous User'
+        // Only set form values if userId is not null (i.e., user is logged in)
+        if (userId !== null) {
+          document.getElementById("userId").value = userId;
+          document.getElementById("username").value = username;
+        } else {
+          // Clear fields if not logged in, or set placeholders
+          document.getElementById("username").placeholder =
+            "Please log in first";
+        }
+
+        // Test API connection
+        testConnection();
+
+        // Fetch user data after page load (if needed, e.g., for auth check)
+        // fetchAndDisplayUserData(); // Keep this if auth checks are needed on this page
+      });
+
+      // --- Functions related to Search, Results, Booking Form ---
+
+      // Test connection (Same as portal.html)
+      function testConnection() {
+        fetch(`${apiUrl}/rooms`)
+          .then((response) => {
+            console.log("Connection test response:", response);
+            if (response.ok) {
+              console.log("API connection successful");
+              return response.json();
+            } else {
+              console.error("API connection failed:", response.status);
+              throw new Error(`HTTP error: ${response.status}`);
+            }
+          })
+          .then((data) => {
+            console.log("All meeting room data:", data);
+          })
+          .catch((error) => {
+            console.error("Connection test error:", error);
+            alert(
+              "API connection failed. Please ensure the backend service is running. Error: " +
+                error.message
+            );
+          });
+      }
+
+      // Handle Create/Modify Submission
+      function handleReservationSubmit() {
+        if (currentModifyingReservationId) {
+          submitModifyReservation();
+        } else {
+          createReservation();
+        }
+      }
+
+      // Search rooms by name (Same as portal.html)
+      function searchRoomsByName() {
+        const name = document.getElementById("searchName").value;
+        console.log("Searching by name:", name);
+
+        fetch(`${apiUrl}/rooms/searchByName?name=${name}`)
+          .then((response) => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Received data:", data);
+            displayRooms(data);
+          })
+          .catch((error) => {
+            document.getElementById("searchResults").innerHTML = `
+                        <div class="alert alert-danger">Error fetching data: ${error.message}</div>
+                    `;
+            console.error("Search error:", error);
+          });
+      }
+
+      // Advanced search (Same as portal.html)
+      function advancedSearch() {
+        // Reset header when starting a new search
+        const headerTitle = document.querySelector("#searchResultsHeader h5");
+        if (headerTitle) {
+          headerTitle.innerHTML =
+            '<i class="fas fa-list me-2"></i>Search Results';
+        }
+
+        const keyword = document.getElementById("keyword").value;
+        const minCapacity = document.getElementById("minCapacity").value;
+        const building = document.getElementById("building").value || null;
+        const floor = document.getElementById("floor").value || null;
+        const hasProjector = document.getElementById("hasProjector").checked
+          ? true
+          : null;
+        const hasWhiteboard = document.getElementById("hasWhiteboard").checked
+          ? true
+          : null;
+        const hasComputer = document.getElementById("hasComputer").checked
+          ? true
+          : null;
+        const hasScreen = document.getElementById("hasScreen").checked
+          ? true
+          : null;
+        const hasSpeaker = document.getElementById("hasSpeaker").checked
+          ? true
+          : null;
+        const isAvailable = document.getElementById("isAvailable").checked
+          ? true
+          : null;
+
+        console.log("Advanced search parameters:", {
+          keyword,
+          minCapacity,
+          building,
+          floor,
+          hasProjector,
+          hasWhiteboard,
+          hasComputer,
+          hasScreen,
+          hasSpeaker,
+          isAvailable,
+        });
+
+        let url = `${apiUrl}/rooms/search?`;
+        if (keyword) url += `keyword=${encodeURIComponent(keyword)}&`;
+        if (minCapacity) url += `capacity=${minCapacity}&`;
+        if (building) url += `building=${encodeURIComponent(building)}&`;
+        if (floor) url += `floor=${encodeURIComponent(floor)}&`;
+        if (hasProjector !== null) url += `hasProjector=${hasProjector}&`;
+        if (hasWhiteboard !== null) url += `hasWhiteboard=${hasWhiteboard}&`;
+        if (hasComputer !== null) url += `hasComputer=${hasComputer}&`;
+        if (hasScreen !== null) url += `hasScreen=${hasScreen}&`;
+        if (hasSpeaker !== null) url += `hasSpeaker=${hasSpeaker}&`;
+        if (isAvailable !== null) url += `isAvailable=${isAvailable}&`;
+
+        // Remove trailing '&' if present
+        url = url.endsWith("&") ? url.slice(0, -1) : url;
+
+        console.log("Request URL:", url);
+
+        fetch(url)
+          .then((response) => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Received data:", data);
+            displayRooms(data);
+          })
+          .catch((error) => {
+            document.getElementById("searchResults").innerHTML = `
+                        <div class="alert alert-danger">Error fetching data: ${error.message}</div>
+                    `;
+            console.error("Search error:", error);
+          });
+      }
+
+      // Display room list (Same as portal.html)
+      function displayRooms(data) {
+        const searchResultsDiv = document.getElementById("searchResults");
+        searchResultsDiv.innerHTML = ""; // Clear previous results
+
+        // Reset header when displaying results table
+        const headerTitle = document.querySelector("#searchResultsHeader h5");
+        if (headerTitle) {
+          headerTitle.innerHTML =
+            '<i class="fas fa-list me-2"></i>Search Results';
+        }
+
+        console.log("Search results:", data);
+
+        // Check if data contains any meeting rooms
+        if (!data || data.length === 0) {
+          searchResultsDiv.innerHTML =
+            "<p>No meeting rooms found matching the criteria.</p>";
+        } else {
+          // Create table to display results
+          const table = document.createElement("table");
+          table.className = "table table-striped";
+          table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Room Name</th>
+                            <th>Capacity</th>
+                            <th>Location</th>
+                            <th>Projector</th>
+                            <th>Whiteboard</th>
+                            <th>Computer</th>
+                            <th>Screen</th>
+                            <th>Speaker</th>
+                            <th>Available</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+          const tbody = table.querySelector("tbody");
+
+          data.forEach((room) => {
+            console.log("Meeting room data:", room);
+            const row = document.createElement("tr");
+            // Check attribute names, handle isAvailable and available attribute names
+            const isAvailable = room.hasOwnProperty("isAvailable")
+              ? room.isAvailable
+              : room.hasOwnProperty("available")
+              ? room.available
+              : null;
+
+            row.innerHTML = `
+                        <td>${room.id}</td>
+                        <td>${room.roomName || "N/A"}</td>
+                        <td>${room.capacity || "N/A"}</td>
+                        <td>${
+                          room.location && room.floor
+                            ? `${room.location}, ${room.floor} Floor` // Combine location, floor number, and " Floor"
+                            : room.location || "N/A" // Fallback to just location if floor is missing
+                        }</td>
+                        <td>${room.hasProjector ? "✓" : "✗"}</td>
+                        <td>${room.hasWhiteboard ? "✓" : "✗"}</td>
+                        <td>${room.hasComputer ? "✓" : "✗"}</td>
+                        <td>${room.hasScreen ? "✓" : "✗"}</td>
+                        <td>${room.hasSpeaker ? "✓" : "✗"}</td>
+                        <td>${
+                          isAvailable === true
+                            ? "Yes"
+                            : isAvailable === false
+                            ? "No"
+                            : "N/A"
+                        }</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                 <button class="btn btn-outline-primary btn-sm me-1" onclick='viewRoomDetails(${JSON.stringify(
+                                   room
+                                 )})'>
+                                     Details
+                                 </button>
+                                 <button class="btn btn-primary btn-sm" onclick='selectRoomForReservation(${
+                                   room.id
+                                 }, "${room.roomName}")'>
+                                     Select
+                                 </button>
+                            </div>
+                        </td>
+                    `;
+            tbody.appendChild(row);
+          });
+          searchResultsDiv.appendChild(table);
+        }
+      }
+
+      // Initialize time slot grid (Same as portal.html)
+      function initializeTimeSlots() {
+        const grid = document.getElementById("timeSlotGrid");
+        const labels = document.getElementById("timeLabels");
+        grid.innerHTML = "";
+        labels.innerHTML = "";
+
+        // Create time slots from 8:00 to 22:00 (15 slots)
+        for (let i = 8; i <= 22; i++) {
+          const slot = document.createElement("div");
+          slot.className = "time-slot";
+          slot.dataset.hour = i;
+          slot.addEventListener("click", handleTimeSlotClick);
+          grid.appendChild(slot);
+
+          // Add hour label
+          const label = document.createElement("div");
+          label.textContent = `${String(i).padStart(2, "0")}:00`;
+          labels.appendChild(label);
+        }
+      }
+
+      // Handle time slot click (Same as portal.html)
+      let selectionStart = null;
+      let selectionEnd = null;
+
+      function handleTimeSlotClick(event) {
+        const clickedSlot = event.target;
+        const clickedHour = parseInt(clickedSlot.dataset.hour);
+
+        // Allow clicking on user's own booked slots (with 'owned' class)
+        if (
+          clickedSlot.classList.contains("reserved") &&
+          !clickedSlot.classList.contains("owned")
+        ) {
+          return; // Reserved and not owned, cannot click
+        }
+
+        if (
+          selectionStart === null ||
+          (selectionStart !== null && selectionEnd !== null)
+        ) {
+          clearSelection();
+          selectionStart = clickedHour;
+          clickedSlot.classList.add("selected");
+        } else {
+          selectionEnd = clickedHour;
+          if (selectionEnd < selectionStart) {
+            [selectionStart, selectionEnd] = [selectionEnd, selectionStart];
+          }
+
+          if (selectionEnd - selectionStart >= 3) {
+            alert("Booking duration cannot exceed 3 hours");
+            selectionEnd = selectionStart + 2; // Limit to max 3 hours
+          }
+
+          const slots = document.querySelectorAll(".time-slot");
+          let hasReservedSlot = false;
+
+          slots.forEach((slot) => {
+            const hour = parseInt(slot.dataset.hour);
+            if (hour >= selectionStart && hour <= selectionEnd) {
+              // Any non-owned reserved slot is considered unavailable
+              if (
+                slot.classList.contains("reserved") &&
+                !slot.classList.contains("owned")
+              ) {
+                hasReservedSlot = true;
+              }
+            }
+          });
+
+          if (hasReservedSlot) {
+            clearSelection();
+            alert(
+              "Cannot select a range that includes time slots already booked by others"
+            );
+            return;
+          }
+
+          updateSelection();
+        }
+
+        updateTimeInputs();
+      }
+
+      // Clear current selection (Same as portal.html)
+      function clearSelection() {
+        const slots = document.querySelectorAll(".time-slot");
+        slots.forEach((slot) => {
+          if (
+            !slot.classList.contains("reserved") ||
+            slot.classList.contains("owned")
+          ) {
+            slot.classList.remove("selected");
+          }
+        });
+        selectionStart = null;
+        selectionEnd = null;
+        document.getElementById("startTime").value = "--:--";
+        document.getElementById("endTime").value = "--:--";
+        document.getElementById("selected-time-range").textContent = "";
+      }
+
+      // Update visual selection (Same as portal.html)
+      function updateSelection() {
+        const slots = document.querySelectorAll(".time-slot");
+        slots.forEach((slot) => {
+          const hour = parseInt(slot.dataset.hour);
+
+          // Handle 'owned' slots within reserved periods
+          const isOwned = slot.classList.contains("owned");
+          const isBlocked = slot.classList.contains("reserved") && !isOwned;
+
+          if (!isBlocked) {
+            slot.classList.remove("selected");
+            if (selectionStart !== null && selectionEnd !== null) {
+              if (hour >= selectionStart && hour <= selectionEnd) {
+                slot.classList.add("selected");
+              }
+            } else if (selectionStart !== null && hour === selectionStart) {
+              slot.classList.add("selected"); // Select only the start if end is null
+            }
+          }
+        });
+      }
+
+      // Update time inputs based on selection (Same as portal.html)
+      function updateTimeInputs() {
+        const startTimeInput = document.getElementById("startTime");
+        const endTimeInput = document.getElementById("endTime");
+        const timeRangeSpan = document.getElementById("selected-time-range");
+
+        if (selectionStart !== null) {
+          const startStr = `${String(selectionStart).padStart(2, "0")}:00`;
+          startTimeInput.value = startStr;
+
+          if (selectionEnd !== null) {
+            const endStr = `${String(selectionEnd + 1).padStart(2, "0")}:00`;
+            endTimeInput.value = endStr;
+            timeRangeSpan.textContent = `${startStr} - ${endStr}`;
+          } else {
+            const endStr = `${String(selectionStart + 1).padStart(2, "0")}:00`; // Default end time is start + 1 hour
+            endTimeInput.value = endStr;
+            timeRangeSpan.textContent = `${startStr} - ${endStr}`; // Show single hour selection
+          }
+        } else {
+          startTimeInput.value = "";
+          endTimeInput.value = "";
+          timeRangeSpan.textContent = "";
+        }
+      }
+
+      // Update time slots based on date and room selection (Same as portal.html)
+      async function updateTimeSlots() {
+        const date = document.getElementById("date").value;
+        const roomId = document.getElementById("roomId").value;
+        const currentUserId = document.getElementById("userId").value; // Get current user ID for 'owned' logic
+
+        if (!date || !roomId) return [];
+
+        clearSelection(); // Clear previous visual selection first
+        const grid = document.getElementById("timeSlotGrid");
+        const slots = document.querySelectorAll(".time-slot");
+
+        // Reset all slots visually before fetching new data
+        slots.forEach((slot) => {
+          slot.classList.remove("reserved", "selected", "owned");
+          slot.style.pointerEvents = "auto";
+          slot.style.cursor = "pointer";
+          slot.title = "Click to select this time slot";
+        });
+
+        grid.style.opacity = "0.5"; // Indicate loading
+
+        try {
+          const response = await fetch(
+            `${apiUrl}/reservations/room/${roomId}/availability?date=${date}`
+          );
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(
+              `Error fetching availability: ${response.status} - ${errorText}`
+            );
+            throw new Error(`HTTP error ${response.status}`);
+          }
+          const reservations = await response.json();
+
+          const activeReservations = reservations.filter(
+            (res) => res.status !== "CANCELED"
+          );
+
+          slots.forEach((slot) => {
+            const hour = parseInt(slot.dataset.hour);
+            let isReservedByOther = false;
+            let isOwnedByCurrentUser = false;
+
+            for (const res of activeReservations) {
+              const resStart = new Date(res.startTime).getHours();
+              const resEnd = new Date(res.endTime).getHours(); // End hour is exclusive
+
+              if (hour >= resStart && hour < resEnd) {
+                // Check if the reservation belongs to the current user
+                if (
+                  res.userId &&
+                  currentUserId &&
+                  res.userId.toString() === currentUserId.toString()
+                ) {
+                  isOwnedByCurrentUser = true;
+                  // If modifying this specific reservation, treat as 'owned' only, not 'reserved'
+                  if (
+                    currentModifyingReservationId &&
+                    res.id === currentModifyingReservationId
+                  ) {
+                    // This logic might be redundant if 'owned' class handles clickability
+                  } else {
+                    // Treat other reservations by the same user as reserved
+                    isReservedByOther = true;
+                  }
+                } else {
+                  isReservedByOther = true;
+                }
+              }
+              if (isReservedByOther && !isOwnedByCurrentUser) break; // No need to check further if blocked by someone else
+            }
+
+            // Apply classes based on checks
+            if (isOwnedByCurrentUser) {
+              slot.classList.add("owned");
+              // If modifying this specific reservation, it should be selectable
+              if (
+                currentModifyingReservationId &&
+                reservations
+                  .find((r) => r.id === currentModifyingReservationId)
+                  ?.startTime.startsWith(
+                    `${date}T${String(hour).padStart(2, "0")}`
+                  )
+              ) {
+                // Don't add 'reserved' if it's the one being modified, allow clicks via 'owned'
+                slot.title = "Currently modifying this booking slot";
+              } else {
+                slot.classList.add("reserved"); // Mark as reserved visually but 'owned' allows interaction
+                slot.title = "You have booked this time slot";
+              }
+            } else if (isReservedByOther) {
+              slot.classList.add("reserved");
+              slot.title = "Booked by others";
+              slot.style.pointerEvents = "none"; // Block interaction
+            }
+          });
+
+          grid.style.opacity = "1"; // Restore opacity after update
+          return activeReservations; // Return fetched data if needed elsewhere
+        } catch (e) {
+          console.error("Error updating time slots:", e);
+          alert(`Could not load availability for ${date}: ${e.message}`);
+          grid.style.opacity = "1";
+          return []; // Return empty array on error
+        }
+      }
+
+      // Modify selectRoomForReservation to update time slots immediately (Same as portal.html)
+      function selectRoomForReservation(roomId, roomName) {
+        console.log(`Selected room: ${roomName} (ID: ${roomId})`);
+        document.getElementById("roomId").value = roomId;
+        document.getElementById("roomName").value = roomName;
+
+        // Get current date or set to today if not selected
+        const dateInput = document.getElementById("date");
+        if (!dateInput.value) {
+          const today = new Date();
+          const yyyy = today.getFullYear();
+          const mm = String(today.getMonth() + 1).padStart(2, "0");
+          const dd = String(today.getDate()).padStart(2, "0");
+          dateInput.value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        // Clear any existing selection
+        clearSelection();
+
+        // Update time slots immediately
+        console.log("Updating time slots after room selection");
+        updateTimeSlots();
+
+        // Scroll to the Create/Modify Booking card
+        const createBookingCard = document.getElementById("createBookingCard");
+        if (createBookingCard) {
+          createBookingCard.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }
+
+      // View room details (Same as portal.html)
+      function viewRoomDetails(room) {
+        fetch(`${apiUrl}/rooms/${room.id}`)
+          .then((response) => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((room) => {
+            const searchResultsDiv = document.getElementById("searchResults");
+            // Update the header of the parent card
+            const headerTitle = document.querySelector(
+              "#searchResultsHeader h5"
+            );
+            if (headerTitle) {
+              headerTitle.innerHTML = `<i class="fas fa-info-circle me-2"></i>Room Details: ${room.roomName}`;
+            }
+
+            // Generate equipment badges HTML conditionally
+            let equipmentHtml = `
+                <span class="badge badge-equipment me-1" style="${
+                  !room.hasProjector ? "display: none;" : ""
+                }"><i class="fas fa-video me-1"></i>Projector</span>
+                <span class="badge badge-equipment me-1" style="${
+                  !room.hasWhiteboard ? "display: none;" : ""
+                }"><i class="fas fa-chalkboard me-1"></i>Whiteboard</span>
+                <span class="badge badge-equipment me-1" style="${
+                  !room.hasComputer ? "display: none;" : ""
+                }"><i class="fas fa-laptop me-1"></i>Computer</span>
+                <span class="badge badge-equipment me-1" style="${
+                  !room.hasScreen ? "display: none;" : ""
+                }"><i class="fas fa-desktop me-1"></i>Screen</span>
+                <span class="badge badge-equipment me-1" style="${
+                  !room.hasSpeaker ? "display: none;" : ""
+                }"><i class="fas fa-volume-up me-1"></i>Speaker</span>
+                ${
+                  !room.hasProjector &&
+                  !room.hasWhiteboard &&
+                  !room.hasComputer &&
+                  !room.hasScreen &&
+                  !room.hasSpeaker
+                    ? "None"
+                    : ""
+                }
+            `;
+
+            // New HTML structure using grid, injected directly into searchResultsDiv
+            searchResultsDiv.innerHTML = `
+                <div class="row g-4">
+                    <div class="col-md-9 d-flex flex-column">
+                        <div>
+                            <dl class="row room-details-list">
+                                <dt class="col-sm-4 mb-2">ID:</dt>
+                                <dd class="col-sm-8">${room.id}</dd>
+
+                                <dt class="col-sm-4 mb-2">Capacity:</dt>
+                                <dd class="col-sm-8">${room.capacity}</dd>
+
+                                <dt class="col-sm-4 mb-2">Location:</dt>
+                                <dd class="col-sm-8">${
+                                  room.location && room.floor
+                                    ? `${room.location}, ${room.floor} Floor` // Combine location, floor number, and " Floor"
+                                    : room.location || "N/A" // Fallback to just location if floor is missing
+                                }</dd>
+
+                                <dt class="col-sm-4 mb-2">Available:</dt>
+                                <dd class="col-sm-8">${
+                                  room.isAvailable || room.available
+                                    ? "Yes"
+                                    : "No"
+                                }</dd>
+
+                                <dt class="col-sm-4 mb-2">Equipment:</dt>
+                                <dd class="col-sm-8"> 
+                                    ${equipmentHtml}
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="mt-4">
+                                <button class="btn btn-outline-secondary me-2" onclick="advancedSearch()">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Search
+                                </button>
+                                <button class="btn btn-primary" onclick='selectRoomForReservation(${
+                                  room.id
+                                }, "${room.roomName}")'>
+                                    <i class="fas fa-check me-1"></i>Select This Room
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <img src="${
+                          room.imageUrl
+                            ? room.imageUrl
+                            : getDefaultImageUrl(room.type)
+                        }"
+                             alt="${room.roomName}"
+                             class="img-fluid rounded room-details-image"
+                             onerror="handleImageError(this)">
+                    </div>
+                </div>
+            `;
+          })
+          .catch((error) => {
+            // Reset header on error as well
+            const headerTitle = document.querySelector(
+              "#searchResultsHeader h5"
+            );
+            if (headerTitle) {
+              headerTitle.innerHTML =
+                '<i class="fas fa-list me-2"></i>Search Results';
+            }
+            document.getElementById("searchResults").innerHTML = `
+                        <div class="alert alert-danger">Error fetching room details: ${error.message}</div>
+                    `;
+            console.error("Error fetching room details:", error);
+          });
+      }
+
+      // Create reservation function (Same as portal.html)
+      function createReservation() {
+        const userId = document.getElementById("userId").value;
+        const roomId = document.getElementById("roomId").value;
+        const topic = document.getElementById("topic").value;
+        const date = document.getElementById("date").value;
+        const startTime = document.getElementById("startTime").value;
+        const endTime = document.getElementById("endTime").value;
+
+        // Validate input
+        if (!userId || !roomId || !topic || !date || !startTime || !endTime) {
+          displayMessage(
+            "reservationResult",
+            "Please fill in all required fields",
+            "danger"
+          );
+          return;
+        }
+        if (userId === "null" || !userId) {
+          displayMessage(
+            "reservationResult",
+            "Could not get user ID, please log in first",
+            "danger"
+          );
+          return;
+        }
+
+        // Validate date
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+          displayMessage(
+            "reservationResult",
+            "Cannot book for a past date",
+            "danger"
+          );
+          return;
+        }
+
+        // Validate time
+        if (endTime <= startTime) {
+          displayMessage(
+            "reservationResult",
+            "End time must be later than start time",
+            "danger"
+          );
+          return;
+        }
+
+        // Format startTime and endTime to ISO datetime string
+        const startDateTime = `${date}T${startTime}:00`;
+        const endDateTime = `${date}T${endTime}:00`;
+
+        const reservation = {
+          userId: parseInt(userId),
+          roomId: parseInt(roomId),
+          topic: topic,
+          reason: topic, // Use topic as reason
+          startTime: startDateTime,
+          endTime: endDateTime,
+        };
+
+        console.log("Creating reservation:", reservation);
+
+        fetch(`${apiUrl}/reservations`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(reservation),
+        })
+          .then((response) => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+              return response.text().then((text) => {
+                throw new Error(
+                  text || `HTTP error! Status: ${response.status}`
+                );
+              });
+            }
+            return response.text();
+          })
+          .then((data) => {
+            displayMessage(
+              "reservationResult",
+              "Booking created successfully!",
+              "success"
+            );
+            // Clear form
+            clearBookingForm();
+            updateTimeSlots(); // Refresh time slots after successful booking
+            // Redirect or update 'My Bookings' if it were on the same page
+          })
+          .catch((error) => {
+            displayMessage(
+              "reservationResult",
+              `Error creating booking: ${error.message}`,
+              "danger"
+            );
+            console.error("Error creating reservation:", error);
+          });
+      }
+
+      // Submit modified reservation (Function needed if modification starts here)
+      function submitModifyReservation() {
+        const reservationId = currentModifyingReservationId; // Use global var
+        const userId = document.getElementById("userId").value;
+        const roomId = document.getElementById("roomId").value;
+        const topic = document.getElementById("topic").value;
+        const date = document.getElementById("date").value;
+        const startTime = document.getElementById("startTime").value;
+        const endTime = document.getElementById("endTime").value;
+
+        if (
+          !reservationId ||
+          !userId ||
+          !roomId ||
+          !topic ||
+          !date ||
+          !startTime ||
+          !endTime
+        ) {
+          displayMessage(
+            "reservationResult",
+            "Please fill in all required fields to modify",
+            "danger"
+          );
+          return;
+        }
+        if (userId === "null" || !userId) {
+          displayMessage(
+            "reservationResult",
+            "Could not get user ID, please log in first",
+            "danger"
+          );
+          return;
+        }
+
+        const startDateTime = `${date}T${startTime}:00`;
+        const endDateTime = `${date}T${endTime}:00`;
+
+        const updatedReservation = {
+          id: reservationId,
+          userId: parseInt(userId),
+          roomId: parseInt(roomId),
+          topic: topic,
+          reason: topic,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          // Include status if needed, though backend might handle it
+          // status: 'PENDING' // or keep existing status logic
+        };
+
+        console.log("Submitting updated reservation:", updatedReservation);
+
+        fetch(`${apiUrl}/reservations/${reservationId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedReservation),
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(
+                `Error updating reservation: ${response.status} - ${errorText}`
+              );
+              throw new Error(
+                errorText || `HTTP error! Status: ${response.status}`
+              );
+            }
+            return response.text(); // Or response.json() if backend returns updated object
+          })
+          .then((data) => {
+            displayMessage(
+              "reservationResult",
+              "Booking updated successfully!",
+              "success"
+            );
+            currentModifyingReservationId = null; // Reset modification state
+            document.getElementById("submitReservationBtn").textContent =
+              "Submit Booking/Modification"; // Reset button text
+            clearBookingForm();
+            updateTimeSlots(); // Refresh time slots after successful update
+            // Potentially redirect to My Bookings page after successful modification
+            // window.location.href = '/user/my-bookings';
+          })
+          .catch((error) => {
+            displayMessage(
+              "reservationResult",
+              `Error updating booking: ${error.message}`,
+              "danger"
+            );
+            console.error("Update error:", error);
+          });
+      }
+
+      // Helper function to clear booking form fields
+      function clearBookingForm() {
+        // Don't clear userId and username as they belong to the logged-in user
+        document.getElementById("roomName").value = "";
+        document.getElementById("roomId").value = "";
+        document.getElementById("topic").value = "Team Meeting"; // Reset to default topic
+        // Reset date to today? Or keep current selection? Let's keep it for now.
+        // document.getElementById("date").value = ""; // Reset date?
+        clearSelection(); // Clears time slots and time inputs
+      }
+
+      // Helper function to display messages
+      function displayMessage(elementId, message, type = "info") {
+        const resultDiv = document.getElementById(elementId);
+        if (resultDiv) {
+          resultDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+          // Auto-clear message after 5 seconds
+          setTimeout(() => {
+            if (resultDiv.innerHTML.includes(message)) {
+              // Check if the same message is still there
+              resultDiv.innerHTML = "";
+            }
+          }, 5000);
+        }
+      }
+
+      // Update floor options to reflect current database structure (Building A/B with 3 floors)
+      function updateFloorOptions() {
+        const building = document.getElementById("building").value;
+        const floorSelect = document.getElementById("floor");
+        floorSelect.innerHTML = ""; // Clear existing options
+
+        // Common floor options structure
+        const defaultOption = '<option value="">All Floors</option>';
+        // Updated floor options for 3 floors
+        const floorOptions =
+          '<option value="1">First Floor</option><option value="2">Second Floor</option><option value="3">Third Floor</option>';
+
+        if (building === "Building A" || building === "Building B") {
+          // Check for A or B
+          floorSelect.innerHTML = defaultOption + floorOptions;
+          // Removed check for Building C as per user request
+          // } else if (building === "Building C") {
+          //   floorSelect.innerHTML = defaultOption + floorOptions; // Kept original 5 floors for C if needed
+        } else {
+          // If no building or an unknown building is selected
+          floorSelect.innerHTML = defaultOption;
+        }
+      }
+
+      // Add capacity validation function (Same as portal.html)
+      function validateCapacity(input) {
+        if (input.value < 1) {
+          input.value = 1;
+        }
+      }
+
+      // Get default image URL based on room type (Same as portal.html)
+      function getDefaultImageUrl(roomType) {
+        if (!roomType) return "/images/default_room.jpg";
+
+        switch (roomType) {
+          case "机房": // Keep Chinese here if it's data from backend? Or translate? Let's translate for consistency.
+            return "/images/computer_lab.jpg";
+          case "大教室":
+            return "/images/classroom.jpg";
+          case "小教室":
+            return "/images/small_room.jpg";
+          default:
+            return "/images/default_room.jpg";
+        }
+      }
+
+      // Add image error handling function (Same as portal.html)
+      function handleImageError(img) {
+        console.error("Failed to load image:", img.src);
+        img.src = "/images/default_room.jpg";
+      }
+
+      // Add date/time formatting function (Needed for potential future use here)
+      function formatDateTime(dateTimeStr) {
+        if (!dateTimeStr) return "N/A";
+        const date = new Date(dateTimeStr);
+        return date.toLocaleString();
+      }
+
+      // Add reservation time formatting function (Needed for potential future use here)
+      function formatReservationTime(startTime, endTime) {
+        if (!startTime || !endTime) return "N/A";
+        const startDateTime = new Date(startTime);
+        const endDateTime = new Date(endTime);
+        const date = startDateTime.toISOString().split("T")[0];
+        const startTimeStr = startDateTime.toTimeString().substring(0, 5);
+        const endTimeStr = endDateTime.toTimeString().substring(0, 5);
+        return `${date}  ${startTimeStr}-${endTimeStr}`;
+      }
+    </script>
+    <!-- Add Shared Theme Script -->
+    <script th:src="@{/scripts/shared/theme.js}"></script>
+
+    <!-- Include Help Center Modal -->
+    <div th:replace="~{user/fragments/help-center :: help_center_modal}"></div>
+  </body>
+</html>
